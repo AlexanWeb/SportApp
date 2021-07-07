@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">CBR__Fitness</string>
+    <string name="username">Username:</string>
+    <string name="alter">Alter:</string>
+    <string name="create_user">Create User</string>
+    <string name="create">Create</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="physical_restrictions">Physical restrictions:</string>
+    <string name="placeholder">...</string>
+    <string name="workout_duration_min">Workout duration(min.):</string>
+    <string name="endomorph">Endomorph</string>
+    <string name="mesomorph">Mesomorph</string>
+    <string name="ectomorph">Ectomorph</string>
+    <string name="bodytype">BodyType:</string>
+    <string name="pro">Pro</string>
+    <string name="password">Password:</string>
+    <string name="female">Female</string>
+    <string name="beginner">Beginner</string>
+    <string name="workout_type">Workout type:</string>
+    <string name="diverse">Diverse</string>
+    <string name="gender">Gender:</string>
+    <string name="male">Male</string>
+    <string name="advanced">Advanced</string>
+</resources>
