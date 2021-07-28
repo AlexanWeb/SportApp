@@ -13,39 +13,39 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.ExpertLogin"></activity>
+        <activity android:name=".activities.ExpertLogin"></activity>
         <activity
-            android:name=".Activities.CBRPlannerResult"
+            android:name=".activities.CBRPlannerResult"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activities.EditExercise"
+            android:name=".activities.EditExercise"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activities.EditPlan"
+            android:name=".activities.EditPlan"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activities.CreateExercise"
+            android:name=".activities.CreateExercise"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activities.CreatePlan"
+            android:name=".activities.CreatePlan"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activities.ConfigurePlan"
+            android:name=".activities.ConfigurePlan"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activities.UserSettings"
+            android:name=".activities.UserSettings"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activities.CBRPlanner"
+            android:name=".activities.CBRPlanner"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activities.UserInterface"
+            android:name=".activities.UserInterface"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activities.CreateUser"
+            android:name=".activities.CreateUser"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activities.MainActivity"
+            android:name=".activities.MainActivity"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
