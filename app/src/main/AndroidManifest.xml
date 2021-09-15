@@ -43,7 +43,8 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.CreateUser"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName=".activities.MainActivity"/>
         <activity
             android:name=".activities.MainActivity"
             android:windowSoftInputMode="adjustPan">

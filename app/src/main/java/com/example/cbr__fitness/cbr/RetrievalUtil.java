@@ -1,18 +1,32 @@
 package com.example.cbr__fitness.cbr;
 
+import android.media.audiofx.DynamicsProcessing;
+
 import com.example.cbr__fitness.activities.MainActivity;
 import com.example.cbr__fitness.data.Exercise;
 import com.example.cbr__fitness.data.ResultCaseExercise;
 import com.example.cbr__fitness.data.ResultCaseUser;
 import com.example.cbr__fitness.data.User;
+import com.example.cbr__fitness.databasehelper.FitnessDBSqliteHelper;
+import com.example.cbr__fitness.enums.EquipmentEnum;
+import com.example.cbr__fitness.enums.GenderEnum;
+import com.example.cbr__fitness.enums.GoalEnum;
+import com.example.cbr__fitness.enums.MuscleEnum;
+import com.example.cbr__fitness.enums.MuscleGroupEnum;
+import com.example.cbr__fitness.enums.WorkoutEnum;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import de.dfki.mycbr.core.DefaultCaseBase;
 import de.dfki.mycbr.core.Project;
+import de.dfki.mycbr.core.casebase.Attribute;
 import de.dfki.mycbr.core.casebase.Instance;
+import de.dfki.mycbr.core.casebase.SymbolAttribute;
 import de.dfki.mycbr.core.model.AttributeDesc;
+import de.dfki.mycbr.core.model.BooleanDesc;
 import de.dfki.mycbr.core.model.Concept;
+import de.dfki.mycbr.core.model.FloatDesc;
 import de.dfki.mycbr.core.model.IntegerDesc;
 import de.dfki.mycbr.core.model.StringDesc;
 import de.dfki.mycbr.core.model.SymbolDesc;
@@ -58,6 +72,138 @@ public class RetrievalUtil {
         this.myConceptExercise = project.getConceptByID(CBREngine.getConceptNameExercise());
     }
 
+    public List<Pair<Exercise, Double>> retrieveExercise(FitnessDBSqliteHelper helper, Exercise exercise
+        , List<EquipmentEnum> equipmentList) {
+
+        List<Pair<Exercise, Double>> similarExercises = new ArrayList<>();
+
+        System.out.println("CaseBase: " + cbExercise.getCases());
+
+        for (AttributeDesc des : myConceptExercise.getAllAttributeDescs().values()) {
+            System.out.println(des.getExpType() + "NAME: " + des.getName());
+        }
+        Retrieval ret = new Retrieval(myConceptExercise, cbExercise);
+        ret.setRetrievalMethod(RetrievalMethod.RETRIEVE_SORTED);
+        Instance query = ret.getQueryInstance();
+
+        SymbolDesc equipment = (SymbolDesc) myConceptExercise.getAllAttributeDescs().get("equipment");
+        myConceptExercise.getActiveAmalgamFct().setWeight(equipment, CBRConstants.WEIGHT_EQUIPMENT);
+        IntegerDesc exerciseID = (IntegerDesc) myConceptExercise.getAllAttributeDescs().get("exerciseID");
+        myConceptExercise.getActiveAmalgamFct().setActive(exerciseID, false);
+        SymbolDesc exerciseType = (SymbolDesc) myConceptExercise.getAllAttributeDescs().get("exercise_type");
+        myConceptExercise.getActiveAmalgamFct().setWeight(exerciseType, CBRConstants.WEIGHT_EXERCISE_TYPE);
+        BooleanDesc isExplosive = (BooleanDesc) myConceptExercise.getAllAttributeDescs().get("is_explosive");
+        myConceptExercise.getActiveAmalgamFct().setWeight(isExplosive, CBRConstants.WEIGHT_IS_EXPLOSIVE);
+        SymbolDesc movementType = (SymbolDesc) myConceptExercise.getAllAttributeDescs().get("movement_type");
+        myConceptExercise.getActiveAmalgamFct().setWeight(movementType, CBRConstants.WEIGHT_MOVEMENT_TYPE);
+        SymbolDesc primaryMuscle = (SymbolDesc) myConceptExercise.getAllAttributeDescs().get("primary_muscle");
+        myConceptExercise.getActiveAmalgamFct().setWeight(primaryMuscle, CBRConstants.WEIGHT_PRIMARY_MUSCLE);
+        SymbolDesc secondaryMuscle = (SymbolDesc) myConceptExercise.getAllAttributeDescs().get("secondary_muscle");
+        myConceptExercise.getActiveAmalgamFct().setWeight(secondaryMuscle, CBRConstants.WEIGHT_SECONDARY_MUSCLE);
+        for (SymbolAttribute s: equipment.getSymbolAttributes()) {
+            System.out.println("ALLOWED: " + s.getName());
+            System.out.println("ATTRIBUTE:: " + s.getValueAsString());
+        }
+        try {
+            for (EquipmentEnum e : equipmentList) {
+                boolean added = query.addAttribute(equipment, e.getSymbol());
+                System.out.println("Successfully Added: " + added + " For value: " + e.getSymbol());
+            }
+            query.addAttribute(exerciseType, exercise.getType().getSymbol());
+            query.addAttribute(isExplosive, exercise.getIsExplosive());
+            query.addAttribute(movementType, exercise.getMovementType().getLabel());
+            query.addAttribute(primaryMuscle, exercise.getMuscle().getSymbol());
+            query.addAttribute(secondaryMuscle, exercise.getSecondaryMuscle().getSymbol());
+        } catch (ParseException exe) {
+            System.out.println("Parse Excep: " + exe);
+        }
+        for (AttributeDesc des : query.getAttributes().keySet()) {
+            System.out.println("Desc: " + des.getName() + " VALUE: " + query.getAttributes().get(des).getValueAsString());
+        }
+        ret.start();
+        List<Pair<Instance, Similarity>> result = ret.getResult();
+
+
+        if (result.size() > 0) {
+            System.out.println(">>>GOT A RESULT");
+            for (Pair<Instance, Similarity> p : result) {
+                if (Integer.parseInt(p.getFirst().getAttributes().get(exerciseID).getValueAsString()) != exercise.getExerciseID()) {
+                }
+                System.out.println("Exercise: "
+                        + Integer.parseInt(p.getFirst().getAttributes().get(exerciseID).getValueAsString())
+                        + " " + p.getSecond().getValue());
+            }
+        }
+
+        return similarExercises;
+    }
+
+    public List<Pair<User, Double>> retrieveUser(User loggedUser) {
+        List<Pair<User, Double>> similarUser = new ArrayList<>();
+        System.out.println("Casebase: " + cbUser.getCases());
+
+        System.out.println(myConceptUser.getName() + "  2. CONCEPT: ");
+
+        for (AttributeDesc des: myConceptUser.getAllAttributeDescs().values()) {
+            System.out.println(des.getExpType() + " NAME: " + des.getName());
+        }
+
+        Retrieval ret = new Retrieval(myConceptUser, cbUser);
+        ret.setRetrievalMethod(RetrievalMethod.RETRIEVE_SORTED);
+        Instance query = ret.getQueryInstance();
+
+        // Query aus der Casebase.
+        IntegerDesc age = (IntegerDesc) myConceptUser.getAllAttributeDescs().get("age");
+        myConceptUser.getActiveAmalgamFct().setWeight(age, CBRConstants.WEIGHT_AGE);
+        IntegerDesc height = (IntegerDesc) myConceptUser.getAllAttributeDescs().get("height");
+        myConceptUser.getActiveAmalgamFct().setWeight(height, CBRConstants.WEIGHT_HEIGHT);
+        SymbolDesc gender = (SymbolDesc) myConceptUser.getAllAttributeDescs().get("gender");
+        myConceptUser.getActiveAmalgamFct().setWeight(gender, CBRConstants.WEIGHT_GENDER);
+        SymbolDesc training_type = (SymbolDesc) myConceptUser.getAllAttributeDescs().get("training_type");
+        myConceptUser.getActiveAmalgamFct().setWeight(training_type, CBRConstants.WEIGHT_TRAINING_TYPE);
+        IntegerDesc weight = (IntegerDesc) myConceptUser.getAllAttributeDescs().get("weight");
+        myConceptUser.getActiveAmalgamFct().setWeight(weight, CBRConstants.WEIGHT_WEIGHT);
+        FloatDesc bmi = (FloatDesc) myConceptUser.getAllAttributeDescs().get("BMI");
+        myConceptUser.getActiveAmalgamFct().setWeight(bmi, CBRConstants.WEIGHT_BMI);
+        IntegerDesc userID = (IntegerDesc) myConceptUser.getAllAttributeDescs().get("userID");
+        myConceptUser.getActiveAmalgamFct().setActive(userID, false);
+
+        try  {
+            query.addAttribute(age, age.getAttribute(loggedUser.getAgeN()));
+            query.addAttribute(height, height.getAttribute(loggedUser.getHeight()));
+            query.addAttribute(gender, gender.getAttribute(loggedUser.getGenderN().getLabel()));
+            query.addAttribute(training_type, training_type.getAttribute(loggedUser.getWorkoutTypeN().getLabel()));
+            query.addAttribute(weight, weight.getAttribute(loggedUser.getWeightN()));
+            query.addAttribute(bmi, bmi.getAttribute(loggedUser.getBMI()));
+        } catch (ParseException ece) {
+            System.out.println("Parse Excep: " + ece);
+        }
+        ret.start();
+        List<Pair<Instance, Similarity>> result = ret.getResult();
+
+        if (result.size() > 0) {
+            System.out.println(">>>GOT A RESULT");
+            for (Pair<Instance, Similarity> p : result) {
+                if (Integer.parseInt(p.getFirst().getAttributes().get(userID).getValueAsString()) != loggedUser.getUid()) {
+                    similarUser.add(new Pair<>(new User(
+                            Integer.parseInt(p.getFirst().getAttributes().get(userID).getValueAsString())
+                            , "empty"
+                            , Integer.parseInt(p.getFirst().getAttributes().get(age).getValueAsString())
+                            , GenderEnum.getEnumByString(p.getFirst().getAttributes().get(gender).getValueAsString())
+                            , Integer.parseInt(p.getFirst().getAttributes().get(weight).getValueAsString())
+                            , Integer.parseInt(p.getFirst().getAttributes().get(height).getValueAsString())
+                            , WorkoutEnum.getEnumByString(p.getFirst().getAttributes().get(training_type).getValueAsString()))
+                            , p.getSecond().getValue()));
+                }
+                System.out.println("USER: "
+                        + Integer.parseInt(p.getFirst().getAttributes().get(userID).getValueAsString())
+                        + " " + p.getSecond().getValue());
+            }
+        }
+        return similarUser;
+    }
+
+    @Deprecated
     // Methode für das Retrieval des Users.
     public ArrayList<ResultCaseUser> retrieveUser(User user, String musclePrio, ArrayList<Integer> weightList) throws ParseException {
 
@@ -125,6 +271,7 @@ public class RetrievalUtil {
         return resultCaseUsers;
     }
 
+    @Deprecated
     // Methode für das Retrieval der Exercise.
     public ArrayList<ResultCaseExercise> retrieveExercise(Exercise exercise) throws ParseException {
 
@@ -183,6 +330,7 @@ public class RetrievalUtil {
         }
         return resultCaseExercises;
     }
+
 
     // Methode um einen Fall des User der CB hinzuzufügen.
     public void addCaseUser(ResultCaseUser rcUser)

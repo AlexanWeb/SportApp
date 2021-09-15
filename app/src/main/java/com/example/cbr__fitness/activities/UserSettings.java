@@ -80,7 +80,7 @@ public class UserSettings extends AppCompatActivity implements View.OnClickListe
         editAge = findViewById(R.id.editAge);
         rgGender = findViewById(R.id.rgGender);
         rgWorkType = findViewById(R.id.rgWorkoutType);
-        rgBodyType = findViewById(R.id.rgBodyType);
+        rgBodyType = findViewById(R.id.editBodyWeight);
         editDuration = findViewById(R.id.editDuration);
         rgRes = findViewById(R.id.rgRes);
         saveUser = findViewById(R.id.saveUser);

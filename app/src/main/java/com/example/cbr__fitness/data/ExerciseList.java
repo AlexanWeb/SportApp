@@ -1,17 +1,121 @@
 package com.example.cbr__fitness.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.example.cbr__fitness.enums.EquipmentEnum;
+import com.example.cbr__fitness.enums.GoalEnum;
+import com.example.cbr__fitness.enums.MuscleGroupEnum;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Jobst-Julius Bartels
  */
 
 // Datenklasse für die Exercise-Liste.
-public class ExerciseList extends ArrayList<Exercise> {
+public class ExerciseList extends ArrayList<Exercise> implements Parcelable {
+
+    private int plan_id;
+
+    private String plan_name;
+
+    private int goal;
+
+    private int muscle_group;
+
+    private List<Exercise> exercises;
 
     // Default-Konstruktor.
-    public ExerciseList() {
+    public ExerciseList () {
 
+    }
+
+    public ExerciseList (int plan_id, int goal, int muscle_group, String name) {
+        exercises = new ArrayList<>();
+        this.plan_id = plan_id;
+        this.goal = goal;
+        this.muscle_group = muscle_group;
+        this.plan_name = name;
+    }
+    public ExerciseList(String name) {
+        this.plan_name = name;
+    }
+
+    protected ExerciseList(Parcel in) {
+        plan_id = in.readInt();
+        plan_name = in.readString();
+        goal = in.readInt();
+        muscle_group = in.readInt();
+    }
+
+    public static final Creator<ExerciseList> CREATOR = new Creator<ExerciseList>() {
+        @Override
+        public ExerciseList createFromParcel(Parcel in) {
+            return new ExerciseList(in);
+        }
+
+        @Override
+        public ExerciseList[] newArray(int size) {
+            return new ExerciseList[size];
+        }
+    };
+
+    public void setPlan_name(String plan_name) {
+        this.plan_name = plan_name;
+    }
+
+    public String getPlan_name() {
+        return plan_name;
+    }
+
+    public GoalEnum getGoal() {return GoalEnum.getEnumByID(goal);}
+
+    public void setGoal(int goal) {this.goal = goal;}
+
+    public int getPlan_id() {
+        return plan_id;
+    }
+
+    public void setPlan_id(int plan_id) {
+        this.plan_id = plan_id;
+    }
+
+    public MuscleGroupEnum getMuscle_group() {
+        return MuscleGroupEnum.getEnumByID(muscle_group);
+    }
+
+    public void setMuscle_group(int muscle_group) {
+        this.muscle_group = muscle_group;
+    }
+
+    public int getDuration() {
+        int duration = 0;
+        for (Exercise e : exercises) {
+            duration += e.getDuration();
+            System.out.println("EXERCISE: " + e.getName() + " Sets: " + e.getSetNumber() +" BreakTime: " + e.getBreakTime());
+        }
+        System.out.println("Sum: " + duration);
+        return duration;
+    }
+
+    public List<EquipmentEnum> getNeededEquipment () {
+        List<EquipmentEnum> equipment  = new ArrayList<>();
+
+        for (Exercise e : exercises) {
+            equipment.add(e.getEquipment());
+        }
+
+        return equipment;
+    }
+
+    public List<Exercise> getExercises() {
+        return exercises;
+    }
+
+    public void addExercise(Exercise e) {
+        exercises.add(e);
     }
 
     // Methode zur Überprüfung, ob eine Exercise existiert.
@@ -72,5 +176,19 @@ public class ExerciseList extends ArrayList<Exercise> {
         }
         exListString = sb.toString();
         return exListString;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        dest.writeInt(plan_id);
+        dest.writeString(plan_name);
+        dest.writeInt(goal);
+        dest.writeInt(muscle_group);
     }
 }

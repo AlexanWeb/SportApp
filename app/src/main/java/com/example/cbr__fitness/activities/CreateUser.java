@@ -1,70 +1,57 @@
 package com.example.cbr__fitness.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.Intent;
+import androidx.constraintlayout.helper.widget.Flow;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import com.example.cbr__fitness.customListenerMethods.ColorChangeToggleListener;
+import com.example.cbr__fitness.customViewElements.ColorChangeToggleButton;
 import com.example.cbr__fitness.data.User;
-import com.example.cbr__fitness.data.UserList;
+import com.example.cbr__fitness.databasehelper.FitnessDBSqliteHelper;
+import com.example.cbr__fitness.data.Limitation;
+import com.example.cbr__fitness.enums.EquipmentEnum;
+import com.example.cbr__fitness.enums.GenderEnum;
+import com.example.cbr__fitness.enums.WorkoutEnum;
 import com.example.cbr__fitness.logic.CBRFitnessUtil;
 import com.example.cbr__fitness.R;
+import com.example.cbr__fitness.logic.SharedPreferenceManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Jobst-Julius Bartels
  */
 
 // Diese Klasse stellt die Aktitivtät zur Erstellung eines Benutzers dar.
-public class CreateUser extends AppCompatActivity implements View.OnClickListener {
+public class CreateUser extends AppCompatActivity {
 
     // Attribute der Klasse.
     private User user;
-    private UserList userList;
     private CBRFitnessUtil cbrFitnessUtil;
     private EditText editName;
     private EditText editPassword;
     private EditText editAge;
     private RadioGroup rgGender;
     private RadioGroup rgWorkType;
-    private RadioGroup rgBodyType;
-    private EditText editDuration;
-    private RadioGroup rgRes;
-    private ImageButton imgButtonLogo;
-    private Button createUserButton;
+    private EditText editBodyWeight;
+    private EditText editBodyHeight;
+    private Flow resFlow;
+    private Flow equipmentFlow;
+    private ConstraintLayout constraintLayout;
 
-    @Override
-    // OnClick Methode der Klasse.
-    public void onClick(View v) {
-        switch (v.getId()) {
+    private List<ColorChangeToggleButton> toggleButtonsRestrictions;
 
-            // Durch Klicken des createUserButtons wird der Benutzer abgespeichert und die nächste Aktivität gestartet.
-            case R.id.createUserButton:
-                if(checkInputs()) {
-                    if(userList.userExists(editName.getText().toString())) {
-                        Toast.makeText(this, "Username already assigned!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        createUser();
-                        cbrFitnessUtil.save("userBase.txt", cbrFitnessUtil.load("userBase.txt", user.getUserToString(), CreateUser.this), CreateUser.this);
-                        finish();
-                        Toast.makeText(this, "User created!", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(this, "Empty Input fields!", Toast.LENGTH_SHORT).show();
-                }
-                break;
+    private List<ColorChangeToggleButton> toggleButtonsEquipment;
 
-            // Durch Klicken des imgButtonLogos gelangt der Benutzer zurück zur vorherigen Aktivität.
-            case R.id.imgButtonLogo:
-                Intent i = new Intent(CreateUser.this, MainActivity.class);
-                startActivity(i);
-                break;
-        }
-    }
+    private FitnessDBSqliteHelper helper;
 
     @Override
     // OnCreate Methode der Klasse.
@@ -76,25 +63,39 @@ public class CreateUser extends AppCompatActivity implements View.OnClickListene
 
         // Initialisierung der Util-Klassen und anderen Attributen.
         user = new User();
-        userList = new UserList();
         cbrFitnessUtil = new CBRFitnessUtil();
-        userList = MainActivity.userList;
 
         //Layout-Attribute.
-        imgButtonLogo = findViewById(R.id.imgButtonLogo);
+        resFlow = findViewById(R.id.resFlowBox);
+        equipmentFlow = findViewById(R.id.flow_choose_equipment_create_user);
         editName = findViewById(R.id.editTextUsername);
         editPassword = findViewById(R.id.editPassword);
         editAge = findViewById(R.id.editAge);
         rgGender = findViewById(R.id.rgGender);
         rgWorkType = findViewById(R.id.rgWorkoutType);
-        rgBodyType = findViewById(R.id.rgBodyType);
-        editDuration = findViewById(R.id.editDuration);
-        rgRes = findViewById(R.id.rgRes);
-        createUserButton = findViewById(R.id.createUserButton);
+        editBodyWeight = findViewById(R.id.editBodyWeight);
+        editBodyHeight = findViewById(R.id.editBodyHeight);
+        Button createUserButton = findViewById(R.id.createUserButton);
+        constraintLayout = findViewById(R.id.constLayout);
 
-        // Hinzufügen der OnClickListener zu den Buttons.
-        imgButtonLogo.setOnClickListener(this);
-        createUserButton.setOnClickListener(this);
+        createUserButton.setOnClickListener(v -> {
+            if(checkInputs()) {
+                if(!helper.checkUserNameAvailable(editName.getText().toString())) {
+                    Toast.makeText(CreateUser.this, "Username already assigned!", Toast.LENGTH_SHORT).show();
+                } else {
+                    createUser();
+                    finish();
+                    Toast.makeText(CreateUser.this, "User created!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(CreateUser.this, "Empty Input fields!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        helper = new FitnessDBSqliteHelper(this);
+
+        setUpRestrictionButtons();
+        setUpEquipmentButtons();
     }
 
     // Diese Methode erstellt aus den Input-Felder einen neuen Benutzer.
@@ -102,29 +103,55 @@ public class CreateUser extends AppCompatActivity implements View.OnClickListene
 
         int rbId;
         RadioButton rb;
-        user.setUsername(editName.getText().toString());
+        String username = editName.getText().toString();
         editName.getText().clear();
+
         user.setUserPassword(editPassword.getText().toString());
+        String password = editPassword.getText().toString();
         editPassword.getText().clear();
+
         user.setAge(editAge.getText().toString());
+        int age  = Integer.parseInt(editAge.getText().toString());
         editAge.getText().clear();
+
         rbId = rgGender.getCheckedRadioButtonId();
         rb = findViewById(rbId);
+        int genderInt  = GenderEnum.valueOf(rb.getText().toString()).getID();
         user.setGender(rb.getText().toString());
         rgGender.clearCheck();
+
         rbId = rgWorkType.getCheckedRadioButtonId();
         rb = findViewById(rbId);
+        int workoutInt = WorkoutEnum.valueOf(rb.getText().toString()).getID();
         user.setWorktype(rb.getText().toString());
         rgWorkType.clearCheck();
-        rbId = rgBodyType.getCheckedRadioButtonId();
-        rb = findViewById(rbId);
-        user.setBodyType(rb.getText().toString());
-        user.setDuration(editDuration.getText().toString());
-        editDuration.getText().clear();
-        rbId = rgRes.getCheckedRadioButtonId();
-        rb = findViewById(rbId);
-        user.setRes(rb.getText().toString());
-        rgRes.clearCheck();
+
+        int bodyWeight = Integer.parseInt(editBodyWeight.getText().toString());
+        editBodyWeight.getText().clear();
+
+        //gets the IDs of the chosen restrictions from the buttons.
+        List<Integer> restrictionIDs = new ArrayList<>();
+        for (ColorChangeToggleButton c : toggleButtonsRestrictions) {
+            if (c.isChecked()) {
+                restrictionIDs.add(c.getItemID());
+            }
+        }
+
+        int bodyHeight = Integer.parseInt(editBodyHeight.getText().toString());
+        editBodyHeight.getText().clear();
+
+        List<Integer> equipmentIDs = new ArrayList<>();
+        for (ColorChangeToggleButton c : toggleButtonsEquipment) {
+            if (c.isChecked()) {
+                equipmentIDs.add(c.getItemID());
+            }
+        }
+
+        long id = helper.inputNewUserIntoDB(username, password, age, genderInt, bodyWeight, bodyHeight
+                , workoutInt, restrictionIDs, equipmentIDs);
+
+        SharedPreferenceManager.saveUserID((int)id, this);
+
         user.setPathData(user.getUsername() +".txt");
         cbrFitnessUtil.save(user.getPathData(),"", CreateUser.this);
     }
@@ -139,17 +166,47 @@ public class CreateUser extends AppCompatActivity implements View.OnClickListene
             check = false;
         } else if(editAge.getText().toString().matches("")) {
             check = false;
-        } else if(editDuration.getText().toString().matches("")) {
-            check = false;
         } else if(rgGender.getCheckedRadioButtonId() == -1) {
-            check = false;
-        } else if(rgRes.getCheckedRadioButtonId() == -1) {
             check = false;
         } else if(rgWorkType.getCheckedRadioButtonId() == -1) {
             check = false;
-        } else if(rgBodyType.getCheckedRadioButtonId() == -1) {
+        } else if(editBodyWeight.getText().toString().matches("")) {
             check = false;
         }
         return check;
+    }
+
+    private void setUpRestrictionButtons() {
+        List<Limitation> limitations = helper.getLimitationsFromDB();
+        for (Limitation l : limitations) {
+            System.out.println("----------------------+ " + l.getName() + " ID; "+ l.getID());
+        }
+        toggleButtonsRestrictions = new ArrayList<>();
+        for (Limitation l : limitations) {
+            ColorChangeToggleButton t = new ColorChangeToggleButton(this, l.getID(), l.getName());
+            t.setOnCheckedChangeListener(ColorChangeToggleListener::onCheckedChanged);
+
+            toggleButtonsRestrictions.add(t);
+            constraintLayout.addView(t);
+
+            resFlow.addView(t);
+        }
+    }
+
+    private void setUpEquipmentButtons() {
+        List<EquipmentEnum> equipmentEnumList = helper.getEquipmentFromDB();
+
+        toggleButtonsEquipment = new ArrayList<>();
+        for (EquipmentEnum eqn : equipmentEnumList) {
+            if (eqn.getID() != 1) { //"Keins" is equipment everyone should have thus its excluded here.
+                ColorChangeToggleButton t = new ColorChangeToggleButton(this, eqn);
+                t.setOnCheckedChangeListener(ColorChangeToggleListener::onCheckedChanged);
+
+                toggleButtonsEquipment.add(t);
+                constraintLayout.addView(t);
+
+                equipmentFlow.addView(t);
+            }
+        }
     }
 }

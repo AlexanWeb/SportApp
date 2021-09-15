@@ -13,21 +13,24 @@ import com.example.cbr__fitness.data.ExerciseList;
 import com.example.cbr__fitness.data.PlanList;
 import com.example.cbr__fitness.data.User;
 import com.example.cbr__fitness.data.UserList;
+import com.example.cbr__fitness.databasehelper.FitnessDBSqliteHelper;
 import com.example.cbr__fitness.logic.CBRFitnessUtil;
 import com.example.cbr__fitness.R;
+import com.example.cbr__fitness.logic.SharedPreferenceManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
-/**
+ /**
  * @author Jobst-Julius Bartels
  */
 
 // Die Klasse stellt die Aktivität für das Startfenster der Applikation bereit.
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     // Attribute der Klasse.
     public static User userLogged;
@@ -36,25 +39,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static ExerciseList exerciseBaseList;
     private CBRFitnessUtil cbrFitnessUtil;
     private Button createAccButton;
-    private ImageButton imageButtonLogin;
     private EditText usernameInput;
     private EditText userPasswordInput;
+    private ImageButton loginButton;
 
-    @Override
-    // OnClick Methode der Klasse.
-    public void onClick(View v) {
-        switch (v.getId()) {
-
-            // Durch das Klicken des imageButtonLogin wird der Login-Prozess gestartet.
-            // ToDo: Übergangslösung, Prozess sollte hier korrekt implementiert werden.
-            case R.id.imageButtonLogin:
-            // Durch das Klicken des createAccButton wird die Aktivität für das Erstellen eines Benutzerprofils gestartet.
-            case R.id.createAccButton:
-                Intent i = new Intent(MainActivity.this, CreateUser.class);
-                startActivity(i);
-                break;
-        }
-    }
     @Override
     // OnCreate Methode der Klasse.
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,21 +60,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //Layout-Attribute
         usernameInput = findViewById(R.id.editUsernameInput);
         userPasswordInput = findViewById(R.id.edituserPasswordInput);
-        imageButtonLogin = findViewById(R.id.imageButtonLogin);
         createAccButton = findViewById(R.id.createAccButton);
+        loginButton = findViewById(R.id.imageButtonLogin);
 
         // OnClickListener werden den Buttons hinzugefügt.
-        createAccButton.setOnClickListener(this);
-        imageButtonLogin.setOnClickListener(this);
+        createAccButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createAccountClick(v);
+            }
+        });
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginClick(v);
+            }
+        });
 
         // Datensätze werden geladen.
         loadDatabases();
     }
 
     public void loginClick (View v) {
+
+        FitnessDBSqliteHelper helper = new FitnessDBSqliteHelper(this);
+        helper.getReadableDatabase();
+        SharedPreferenceManager.resetRolls(this);
         userLogged = null;
         userList = cbrFitnessUtil.getUserList(cbrFitnessUtil.loadAll("userBase.txt", MainActivity.this));
-
+        int id = helper.loginUser(usernameInput.getText().toString(), userPasswordInput.getText().toString());
         // Eingabefelder werden auf Inhalt überprüft.
         if(!usernameInput.getText().toString().isEmpty() && !userPasswordInput.getText().toString().isEmpty()) {
 
@@ -99,10 +101,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent i = new Intent(MainActivity.this, ExpertLogin.class);
                 startActivity(i);
 
-                // Überprüfung, ob die Daten valide sind.
-            } else if(userList.checkUser(usernameInput.getText().toString(), userPasswordInput.getText().toString())) {
-                userLogged = userList.getLoggedUser(usernameInput.getText().toString(), userPasswordInput.getText().toString());
-                userLogged.setPlanList(cbrFitnessUtil.getUserPList(cbrFitnessUtil.loadAll(userLogged.getPathData(), MainActivity.this)));
+                // Überprüfung, ob die Daten valide sind. (id is only -1 if the DB did not find any user)
+            } else if(id != -1) {
+                SharedPreferenceManager.saveUserID(id, MainActivity.this);
+                List<Integer> rolls = helper.getRollsByUserId(id);
+                if (rolls.contains(3)) {
+                    System.out.println("SETTING THESE");
+                    SharedPreferenceManager.saveUserAdminRoll(3, MainActivity.this);
+                }
                 usernameInput.getText().clear();
                 userPasswordInput.getText().clear();
                 Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
@@ -116,6 +122,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             Toast.makeText(this, "Username or Password is missing!", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void createAccountClick(View v) {
+        Intent i = new Intent(MainActivity.this, CreateUser.class);
+        startActivity(i);
     }
 
     // Diese Methode ist für das Laden der Datensätze verantwortlich.

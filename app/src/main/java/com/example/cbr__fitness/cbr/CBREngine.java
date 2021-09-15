@@ -18,9 +18,9 @@ public class CBREngine {
     // private static String projectName = "CBR_Fitness.prj";
     private static String projectName = "CBR_Fitness.prj";
     // name of the central concept
-    private static String conceptNameUser = "User";
+    private static String conceptNameUser = "person";
     // name of the central concept
-    private static String conceptNameExercise = "Exercise";
+    private static String conceptNameExercise = "exercise";
     // name of the csv containing the instances
     private static String csv = "user_caseBase.csv";
     // set the separators that are used in the csv file
@@ -28,8 +28,8 @@ public class CBREngine {
     private static String multiplevalueseparator = ",";
     // name of the case base that should be used; the default name in myCBR is
     // CB_csvImport
-    private static String casebaseUser = "user_caseBase";
-    private static String casebaseExercise = "exercise_caseBase";
+    private static String casebaseUser = "person_case_base";
+    private static String casebaseExercise = "exercise_case_base";
 
     // Getter for the Project meta data
     public static String getCaseBaseUser() {
@@ -119,7 +119,7 @@ public class CBREngine {
         try {
             // load new project
             project = new Project(data_path + projectName);
-            System.out.println(">>> DATE_PATH: " + data_path);
+            System.out.println(">>> DATA_PATH: " + data_path);
             // create a concept and get the main concept of the project;
             // the name has to be specified at the beginning of this class
             while (project.isImporting()) {

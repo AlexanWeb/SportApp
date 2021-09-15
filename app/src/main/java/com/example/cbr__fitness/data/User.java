@@ -1,11 +1,156 @@
 package com.example.cbr__fitness.data;
 
+import androidx.annotation.NonNull;
+
+import com.example.cbr__fitness.enums.EquipmentEnum;
+import com.example.cbr__fitness.enums.GenderEnum;
+import com.example.cbr__fitness.enums.LimitationEnum;
+import com.example.cbr__fitness.enums.WorkoutEnum;
+import com.example.cbr__fitness.interfaces.ToCaseCsvInterface;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Jobst-Julius Bartels
  */
 
 // Datenklasse für den Benutzer (engl. user)
-public class User {
+public class User implements ToCaseCsvInterface {
+
+    private int uid;
+    private String userName;
+    private int ageN;
+    private GenderEnum genderN;
+    private int weightN;
+    private int height;
+    private WorkoutEnum workoutTypeN;
+    private List<LimitationEnum> limitations;
+    private List<EquipmentEnum> equipments;
+    private List<Integer> rolls;
+
+    public User (int uid, String userName, int ageN, GenderEnum genderN, int weightN, int height
+            , WorkoutEnum workoutTypeN, List<LimitationEnum> limitations
+            , List<EquipmentEnum> equipments, List<Integer> rolls) {
+        this.uid = uid;
+        this.userName = userName;
+        this.ageN = ageN;
+        this.genderN = genderN;
+        this.weightN = weightN;
+        this.height = height;
+        this.workoutTypeN = workoutTypeN;
+        this.limitations = limitations;
+        this.equipments = equipments;
+        this.rolls = rolls;
+    }
+
+    public User (int uid, String userName, int ageN, GenderEnum genderN, int weightN
+            , int height, WorkoutEnum workoutTypeN) {
+
+        this(uid, userName, ageN, genderN, weightN, height, workoutTypeN, new ArrayList<>()
+            , new ArrayList<>(), new ArrayList<>());
+    }
+
+    public void setEquipments(List<EquipmentEnum> equipments) {
+        this.equipments = equipments;
+    }
+
+    public void setLimitations(List<LimitationEnum> limitations) {
+        this.limitations = limitations;
+    }
+
+    public void setRolls(List<Integer> rolls){this.rolls = rolls; }
+    //Id of the admin roll is 3
+    public boolean isAdmin(){
+        return rolls.contains(3);
+    }
+
+    public int getUid() {
+        return uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public int getAgeN() {
+        return ageN;
+    }
+
+    public void setAgeN(int ageN) {
+        this.ageN = ageN;
+    }
+
+    public GenderEnum getGenderN() {
+        return genderN;
+    }
+
+    public void setGenderN(GenderEnum genderN) {
+        this.genderN = genderN;
+    }
+
+    public int getWeightN() {
+        return weightN;
+    }
+
+    public void setWeightN(int weightN) {
+        this.weightN = weightN;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public WorkoutEnum getWorkoutTypeN() {
+        return workoutTypeN;
+    }
+
+    public void setWorkoutTypeN(WorkoutEnum workoutTypeN) {
+        this.workoutTypeN = workoutTypeN;
+    }
+
+    public List<LimitationEnum> getLimitations() {
+        return limitations;
+    }
+
+    public List<EquipmentEnum> getEquipments() {
+        return equipments;
+    }
+
+
+    public String toCsvCase() {
+        return  uid + ";" + ageN + ";" + genderN.getLabel() +
+                ";" + weightN + ";" + height + ";" + getBMI() +
+                ";" + workoutTypeN.getLabel() + "\n";
+    }
+
+    @NonNull
+    public String toString() {
+        StringBuilder base = new StringBuilder("USERID: " + uid  + " USER: " + userName + " AGE: " + ageN
+                + " GENDER: " + genderN.toString() + " WEIGHT: " + weightN + " WORKOUTTYPE: " + workoutTypeN.toString());
+        for (LimitationEnum l : limitations) {
+            base.append(", ").append(l.getLabel());
+        }
+        for (EquipmentEnum e : equipments) {
+            base.append("; ").append(e.getLabel());
+        }
+        return base.toString();
+    }
+
+    public int getHeight() { return height; }
+
+    public float getBMI() {
+        return (weightN / (height* 1.0f) / (height * 1.0f)) * 10000;
+    }
+
 
     //Membervariablen.
     private String username;

@@ -1,13 +1,20 @@
 package com.example.cbr__fitness.data;
 
+import com.example.cbr__fitness.enums.EquipmentEnum;
+import com.example.cbr__fitness.enums.ExerciseTypeEnum;
+import com.example.cbr__fitness.enums.MovementTypeEnum;
+import com.example.cbr__fitness.enums.MuscleEnum;
+import com.example.cbr__fitness.interfaces.ToCaseCsvInterface;
+
 /**
  * @author Jobst-Julius Bartels
  */
 
 // Datenklasse für die Übung (engl. exercise).
-public class Exercise {
+public class Exercise implements ToCaseCsvInterface {
 
     // Membervariablen.
+
     private String exName;
     private String exSetNumber;
     private String exRep;
@@ -17,6 +24,68 @@ public class Exercise {
     private String exTime;
     private String exType;
     private String exRating;
+
+    //determines the plan this belongs to
+    private int planID;
+    private int exerciseID;
+    private String name;
+    private int setNumber;
+    private int repNumber;
+    private int breakTime;
+    private int weight;
+    private MuscleEnum muscle;
+    private MuscleEnum secondaryMuscle;
+    private int repTime;
+    private ExerciseTypeEnum type;
+    private String description;
+    private EquipmentEnum equipment;
+    private MovementTypeEnum movementType;
+    private boolean isExplosive;
+
+    public String getName() {
+        return name;
+    }
+
+    public int getSetNumber() {
+        return setNumber;
+    }
+
+    public int getRepNumber() {
+        return repNumber;
+    }
+
+    public int getBreakTime() {
+        return breakTime;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public MuscleEnum getMuscle() {
+        return muscle;
+    }
+
+    public int getRepTime() {
+        return repTime;
+    }
+
+    public ExerciseTypeEnum getType() {
+        return type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean getIsExplosive() {
+        return isExplosive;
+    }
+
+    public int getPlanID() {
+        return planID;
+    }
+
 
     // Enumerations.
     public enum ExType {
@@ -31,9 +100,9 @@ public class Exercise {
     // Default-Konstruktor.
     public Exercise(){
     }
-
-    // Konstruktor.
-    public Exercise(String exName, String exSetNumber, String exRep, String exBreak, String exWeight, String exMuscle, String exTime, String exType, String exRating){
+    @Deprecated
+    public Exercise(String exName, String exSetNumber, String exRep, String exBreak, String exWeight
+            , String exMuscle, String exTime, String exType, String exRating){
         this.exName = exName;
         this.exSetNumber = exSetNumber;
         this.exRep = exRep;
@@ -45,6 +114,84 @@ public class Exercise {
         this.exRating = exRating;
     }
 
+    // Konstruktor.
+    public Exercise(int plan_id, int exerciseID , String name, int setNumber, int repNumber
+            , int breakTime, int weight, MuscleEnum muscle, MuscleEnum secondaryMuscle, int repTime
+            , ExerciseTypeEnum type, EquipmentEnum equipment, String description
+            , MovementTypeEnum movementType, boolean isExplosive) {
+        this.planID = plan_id;
+        this.exerciseID = exerciseID;
+        this.name = name;
+        this.setNumber = setNumber;
+        this.repNumber = repNumber;
+        this.breakTime = breakTime;
+        this.weight = weight;
+        this.muscle = muscle;
+        this.secondaryMuscle = secondaryMuscle;
+        this.repTime = repTime;
+        this.type = type;
+        this.equipment = equipment;
+        this.description = description;
+        this.movementType = movementType;
+        this.isExplosive = isExplosive;
+    }
+
+    public Exercise(int exerciseID , String name, MuscleEnum muscle, MuscleEnum secondaryMuscle, int repTime
+            , ExerciseTypeEnum type, EquipmentEnum equipment, String description
+            , MovementTypeEnum movementType, boolean isExplosive) {
+        this(-1, exerciseID, name, 0, 0, 0, 0, muscle
+                , secondaryMuscle, repTime, type, equipment, description, movementType
+                , isExplosive);
+    }
+
+    public void setBreakTime(int breakTime) {
+        this.breakTime = breakTime;
+    }
+
+    public void setRepNumber(int repNumber) {
+        this.repNumber = repNumber;
+    }
+
+    public void setSetNumber(int setNumber) {
+        this.setNumber = setNumber;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public int getExerciseID() {
+        return exerciseID;
+    }
+
+    public MuscleEnum getSecondaryMuscle(){
+        return secondaryMuscle;
+    }
+
+    public int getDuration() {
+        int duration = setNumber * breakTime;
+        duration += setNumber * repNumber * repTime;
+        return duration;
+    }
+
+    public void setPlanID(int planID) {
+        this.planID = planID;
+    }
+
+    public EquipmentEnum getEquipment() {
+        return equipment;
+    }
+
+    public MovementTypeEnum getMovementType() {
+        return movementType;
+    }
+    // "exerciseID;primary_muscle;secondary_muscle;exercise_type;equipment;movement_type\n"
+    public String toCsvCase() {
+        return  exerciseID + ";" + muscle.getSymbol() + ";" + secondaryMuscle.getSymbol()
+                + ";" + type.getSymbol() + ";" + equipment.getSymbol() + ";" + movementType.getLabel()
+                + ";" + isExplosive
+                + "\n";
+    }
 
     // Setter-Methoden.
     public void setExName(String exName) {
