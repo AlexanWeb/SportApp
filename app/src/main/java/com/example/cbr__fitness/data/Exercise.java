@@ -40,6 +40,7 @@ public class Exercise implements ToCaseCsvInterface {
     private String description;
     private EquipmentEnum equipment;
     private MovementTypeEnum movementType;
+    boolean isBodyweight;
     private boolean isExplosive;
 
     public String getName() {
@@ -82,6 +83,10 @@ public class Exercise implements ToCaseCsvInterface {
         return isExplosive;
     }
 
+    public boolean isBodyweight() {
+        return isBodyweight;
+    }
+
     public int getPlanID() {
         return planID;
     }
@@ -118,7 +123,7 @@ public class Exercise implements ToCaseCsvInterface {
     public Exercise(int plan_id, int exerciseID , String name, int setNumber, int repNumber
             , int breakTime, int weight, MuscleEnum muscle, MuscleEnum secondaryMuscle, int repTime
             , ExerciseTypeEnum type, EquipmentEnum equipment, String description
-            , MovementTypeEnum movementType, boolean isExplosive) {
+            , MovementTypeEnum movementType, boolean isExplosive, boolean isBodyweight) {
         this.planID = plan_id;
         this.exerciseID = exerciseID;
         this.name = name;
@@ -134,14 +139,15 @@ public class Exercise implements ToCaseCsvInterface {
         this.description = description;
         this.movementType = movementType;
         this.isExplosive = isExplosive;
+        this.isBodyweight = isBodyweight;
     }
 
     public Exercise(int exerciseID , String name, MuscleEnum muscle, MuscleEnum secondaryMuscle, int repTime
             , ExerciseTypeEnum type, EquipmentEnum equipment, String description
-            , MovementTypeEnum movementType, boolean isExplosive) {
+            , MovementTypeEnum movementType, boolean isExplosive, boolean isBodyweight) {
         this(-1, exerciseID, name, 0, 0, 0, 0, muscle
                 , secondaryMuscle, repTime, type, equipment, description, movementType
-                , isExplosive);
+                , isExplosive, isBodyweight);
     }
 
     public void setBreakTime(int breakTime) {

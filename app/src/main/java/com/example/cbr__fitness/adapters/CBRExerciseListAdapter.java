@@ -14,9 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.cbr__fitness.R;
 import com.example.cbr__fitness.customViewElements.ColorChangeToggleButton;
 import com.example.cbr__fitness.data.ExerciseList;
+import com.example.cbr__fitness.logic.AccountUtil;
 
 import org.w3c.dom.Text;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +28,13 @@ public class CBRExerciseListAdapter extends RecyclerView.Adapter<CBRExerciseList
 
     private List<Pair<ExerciseList, Double>> results;
 
-    private int activeButtonPosition = -1;
+    private int activeButtonPosition = 0;
+
+    DecimalFormat format;
 
     public CBRExerciseListAdapter (List<Pair<ExerciseList, Double>> results) {
         this.results = results;
+        this.format = new DecimalFormat("#.###");
     }
 
     @NonNull
@@ -53,10 +58,12 @@ public class CBRExerciseListAdapter extends RecyclerView.Adapter<CBRExerciseList
         muscleGroup.setText(list.getFirst().getMuscle_group().getLabel());
         TextView goal = holder.goal;
         goal.setText(list.getFirst().getGoal().getLabel());
+        TextView duration = holder.duration;
+        duration.setText(AccountUtil.getDurationAsTime(list.getFirst().getDuration()));
         ColorChangeToggleButton button = holder.button;
         button.setChecked(position == activeButtonPosition);
         TextView similarity = holder.similarity;
-        similarity.setText(Double.toString(list.getSecond()));
+        similarity.setText(format.format(list.getSecond()));
     }
 
     public Pair<ExerciseList,Double> getActivePair(){
@@ -77,6 +84,8 @@ public class CBRExerciseListAdapter extends RecyclerView.Adapter<CBRExerciseList
 
         private TextView similarity;
 
+        private TextView duration;
+
         private ColorChangeToggleButton button;
 
         public CBRExerciseListViewHolder(@NonNull View itemView) {
@@ -84,6 +93,7 @@ public class CBRExerciseListAdapter extends RecyclerView.Adapter<CBRExerciseList
             planHeader = itemView.findViewById(R.id.text_title_cbr_result_exercise_list_recycler_item);
             muscleGroup = itemView.findViewById(R.id.text_prime_muscle_cbr_result_exercise_list_recycler_item);
             goal = itemView.findViewById(R.id.text_goal_cbr_result_exercise_list_recycler_item);
+            duration = itemView.findViewById(R.id.text_duration_cbr_result_exercise_list_recycler_item);
             button = itemView.findViewById(R.id.color_change_toggle_chosen_recycler_item);
             button.setOnClickListener((buttonView) -> {
                 int lastButton = activeButtonPosition;

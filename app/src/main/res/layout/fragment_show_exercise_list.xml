@@ -7,17 +7,44 @@
     android:id="@+id/fragment_show_exercise_list"
     tools:context=".fragments.ShowExerciseList">
 
-    <!-- TODO: Update blank fragment layout -->
+
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/no_name_found"
-        android:id="@+id/text_duration_show_exercise_list"
+        android:text="@string/goal_label"
+        android:id="@+id/text_label_goal_show_exercise_list"
+        android:layout_marginTop="10dp"
         android:layout_marginStart="10dp"
         android:textSize="@dimen/target_text_size_small"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/text_goal_show_exercises_list" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:id="@+id/text_goal_show_exercises_list"
+        android:text="@string/app_name"
+        android:layout_marginEnd="10dp"
+        android:textSize="@dimen/target_text_size_small"
+        android:gravity = "center"
+        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintStart_toEndOf="@id/text_label_goal_show_exercise_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/text_label_goal_show_exercise_list"
+        app:layout_constraintBottom_toBottomOf="@id/text_label_goal_show_exercise_list"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/prime_muscle_label"
+        android:id="@+id/text_label_prime_muscle_show_exercise_list"
+        android:layout_marginStart="10dp"
+        android:textSize="@dimen/target_text_size_small"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_label_goal_show_exercise_list"
         app:layout_constraintEnd_toStartOf="@id/text_prime_muscle_show_exercise_list" />
 
     <TextView
@@ -25,26 +52,44 @@
         android:layout_height="0dp"
         android:text="@string/no_goal_found"
         android:id="@+id/text_prime_muscle_show_exercise_list"
+        android:layout_marginEnd="10dp"
+        android:textSize="@dimen/target_text_size_small"
+        android:gravity = "center"
+        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintTop_toTopOf="@id/text_label_prime_muscle_show_exercise_list"
+        app:layout_constraintStart_toEndOf="@id/text_label_prime_muscle_show_exercise_list"
+        app:layout_constraintBottom_toBottomOf="@id/text_label_prime_muscle_show_exercise_list"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/target_duration"
+        android:id="@+id/text_label_duration_show_exercise_list"
         android:layout_marginStart="10dp"
         android:textSize="@dimen/target_text_size_small"
         app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintTop_toTopOf="@id/text_duration_show_exercise_list"
-        app:layout_constraintStart_toEndOf="@id/text_duration_show_exercise_list"
-        app:layout_constraintBottom_toBottomOf="@id/text_duration_show_exercise_list"
-        app:layout_constraintEnd_toStartOf="@+id/text_goal_show_exercises_list"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_label_prime_muscle_show_exercise_list"
+        app:layout_constraintEnd_toStartOf="@id/text_duration_show_exercise_list" />
 
     <TextView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:id="@+id/text_goal_show_exercises_list"
-        android:text="@string/app_name"
-        android:layout_marginStart="10dp"
+        android:text="@string/no_name_found"
+        android:id="@+id/text_duration_show_exercise_list"
+        android:layout_marginEnd="10dp"
         android:textSize="@dimen/target_text_size_small"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintStart_toEndOf="@id/text_prime_muscle_show_exercise_list"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/text_prime_muscle_show_exercise_list"
-        app:layout_constraintBottom_toBottomOf="@id/text_prime_muscle_show_exercise_list"/>
+        android:gravity = "center"
+        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintStart_toEndOf="@id/text_label_duration_show_exercise_list"
+        app:layout_constraintTop_toTopOf="@id/text_label_duration_show_exercise_list"
+        app:layout_constraintBottom_toBottomOf="@id/text_label_duration_show_exercise_list"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="0dp"
@@ -63,16 +108,17 @@
     </androidx.recyclerview.widget.RecyclerView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floating_edit_button_show_exercise_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/floating_edit_button_show_exercise_list"
-        android:src="@drawable/ic_edit"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         android:backgroundTint="@color/darkGrayRecycler"
-        app:tint="@color/white"
+        android:src="@drawable/ic_edit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"/>
+        app:tint="@color/white"
+        tools:ignore="SpeakableTextPresentCheck" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

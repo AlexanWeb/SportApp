@@ -20,6 +20,7 @@ import com.example.cbr__fitness.R;
 import com.example.cbr__fitness.data.Exercise;
 import com.example.cbr__fitness.viewModels.ExerciseViewModel;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class ExchangeExercisesAdapter extends RecyclerView.Adapter<ExchangeExercisesAdapter.ExchangeExercisesViewHolder> {
@@ -31,7 +32,6 @@ public class ExchangeExercisesAdapter extends RecyclerView.Adapter<ExchangeExerc
     public ExchangeExercisesAdapter(List<Exercise> exercises, FragmentActivity context) {
         this.exercises = exercises;
         exerciseViewModel = new ViewModelProvider(context).get(ExerciseViewModel.class);
-
     }
 
     @NonNull

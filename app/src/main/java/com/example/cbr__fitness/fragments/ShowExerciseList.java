@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.example.cbr__fitness.R;
 import com.example.cbr__fitness.adapters.ExercisesAdapter;
 import com.example.cbr__fitness.customListenerMethods.ItemClickSupport;
+import com.example.cbr__fitness.logic.AccountUtil;
 import com.example.cbr__fitness.viewModels.ExerciseViewModel;
 import com.example.cbr__fitness.viewModels.PlanViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -100,7 +101,7 @@ public class ShowExerciseList extends Fragment {
 
         PlanViewModel model = new ViewModelProvider(requireActivity()).get(PlanViewModel.class);
         model.getSelected().observe(getViewLifecycleOwner(), list -> {
-            durationTextView.setText(Integer.toString(list.getDuration()/60));
+            durationTextView.setText(AccountUtil.getDurationAsTime(list.getDuration()));
             goalShowExercise.setText((list.getGoal()).getLabel());
             primeMuscle.setText(list.getMuscle_group().getLabel());
             ExercisesAdapter adapter = new ExercisesAdapter(list.getExercises());

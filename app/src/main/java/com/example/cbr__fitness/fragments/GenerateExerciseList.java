@@ -150,6 +150,7 @@ public class GenerateExerciseList extends Fragment {
             bundle.putInt("group", getCheckedMuscleGroup().getID());
             bundle.putInt("goal", getCheckedWorkoutGoal().getID());
             bundle.putInt("duration", Integer.parseInt(timeEditText.getText().toString()));
+            enumsChosen = false;
             Navigation.findNavController(view).navigate
                     (R.id.action_fragment_generate_exercise_list_to_fragment_show_cbr_result, bundle);
         });

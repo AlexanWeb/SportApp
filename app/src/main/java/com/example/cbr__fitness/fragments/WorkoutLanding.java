@@ -19,7 +19,9 @@ import com.example.cbr__fitness.customListenerMethods.ItemClickSupport;
 import com.example.cbr__fitness.data.ExerciseList;
 import com.example.cbr__fitness.databasehelper.FitnessDBSqliteHelper;
 import com.example.cbr__fitness.logic.SharedPreferenceManager;
+import com.example.cbr__fitness.viewModels.ExerciseListListViewModel;
 import com.example.cbr__fitness.viewModels.PlanViewModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -92,6 +94,8 @@ public class WorkoutLanding extends Fragment {
         FitnessDBSqliteHelper helper = new FitnessDBSqliteHelper(getActivity().getApplicationContext());
         model = new ViewModelProvider(requireActivity()).get(PlanViewModel.class);
         Button generateButton = view.findViewById(R.id.button_generate_workout_landing);
+        Button createExercise = view.findViewById(R.id.button_create_workout_landing);
+        FloatingActionButton floating = view.findViewById(R.id.floating_edit_button_workout);
 
         if (first) {
             exerciseLists =  helper.getExerciseListsByUser(SharedPreferenceManager.getLoggedUserID(getActivity().getApplicationContext()));
@@ -102,21 +106,25 @@ public class WorkoutLanding extends Fragment {
                 Navigation.findNavController(v)
                         .navigate(R.id.action_fragment_workout_landing_to_fragment_generate_exercise_list));
 
-        RecyclerView exerciseListView = (RecyclerView) view.findViewById(R.id.recycler_workout_landing);
+        RecyclerView exerciseListView = view.findViewById(R.id.recycler_workout_landing);
 
-        ExerciseListAdapter adapter = new ExerciseListAdapter(exerciseLists);
+        ExerciseListAdapter adapter = new ExerciseListAdapter(exerciseLists, requireContext());
         exerciseListView.setAdapter(adapter);
         exerciseListView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
 
-        ItemClickSupport.addTo(exerciseListView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-            @Override
-            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                model.addPlanList(exerciseLists.get(position));
-                Bundle bundle = new Bundle();
-                bundle.putString("title",exerciseLists.get(position).getPlan_name());
-                bundle.putBoolean("result", false);
-                Navigation.findNavController(v).navigate(R.id.action_fragment_workout_landing_to_fragment_show_exercise_list_fragment, bundle);
-            }
+        ItemClickSupport.addTo(exerciseListView).setOnItemClickListener((recyclerView, position, v) -> {
+            model.addPlanList(exerciseLists.get(position));
+            Bundle bundle = new Bundle();
+            bundle.putString("title",exerciseLists.get(position).getPlan_name());
+            bundle.putBoolean("result", false);
+            Navigation.findNavController(v).navigate(R.id.action_fragment_workout_landing_to_fragment_show_exercise_list_fragment, bundle);
         });
+        floating.setOnClickListener(v -> {
+            ExerciseListListViewModel allExerciseLists = new ViewModelProvider(requireActivity()).get(ExerciseListListViewModel.class);
+            allExerciseLists.addExercise(exerciseLists);
+            Navigation.findNavController(v).navigate(R.id.action_fragment_workout_landing_to_fragment_delete_workouts);
+        });
+        createExercise.setOnClickListener(
+                v -> Navigation.findNavController(v).navigate(R.id.action_fragment_workout_landing_to_fragment_create_exercises));
     }
 }

@@ -17,11 +17,12 @@ public enum EquipmentEnum implements EnumInterface {
     FitnessStudio(2, "Fitness Studio", "fitness_studio"),
     Hantel(3, "Hantel", "hantel"),
     Theraband(4, "Theraband", "theraband"),
-    Dumbells(5, "Kettelbell", "kettelbell"),
+    KETTELBELL(5, "Kettelbell", "kettelbell"),
     Klimmzugstange(6, "Klimmzugstange", "klimmzugstange"),
     Hantelbank(7, "Hantelbank", "hantelbank"),
     Langhantel(8, "Langhantel", "langhantel"),
-    DipBars(9, "Dip Bars", "dip_bars")
+    DipBars(9, "Dip Bars", "dip_bars"),
+    BENCH(10, "Bench", "bench")
     ;
 
     private static Map<Integer, EquipmentEnum> equipmentEnumMap = new HashMap<>();

@@ -16,6 +16,12 @@
         <action
             android:id="@+id/action_fragment_workout_landing_to_fragment_generate_exercise_list"
             app:destination="@id/fragment_generate_exercise_list" />
+        <action
+            android:id="@+id/action_fragment_workout_landing_to_fragment_delete_workouts"
+            app:destination="@id/fragment_delete_workouts" />
+        <action
+            android:id="@+id/action_fragment_workout_landing_to_fragment_create_exercises"
+            app:destination="@id/fragment_create_exercises" />
     </fragment>
 
     <fragment
@@ -118,6 +124,36 @@
         android:name="com.example.cbr__fitness.fragments.ExchangeExerciseCbrResult"
         android:label="Austausch"
         tools:layout="@layout/fragment_exchange_exercise_cbr_result">
+        <action
+            android:id="@+id/action_fragment_exchange_exercise_cbr_result_to_fragment_show_exercise"
+            app:destination="@id/fragment_show_exercise" />
+        <action
+            android:id="@+id/action_fragment_exchange_exercise_cbr_result_to_fragment_edit_exercise_list"
+            app:destination="@id/fragment_edit_exercise_list"
+            app:popUpTo="@id/fragment_edit_exercise_list"
+            app:popUpToInclusive="true"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_delete_workouts"
+        android:name="com.example.cbr__fitness.fragments.DeleteWorkouts"
+        android:label="Delete"
+        tools:layout="@layout/fragment_delete_workouts">
+        <action
+            android:id="@+id/action_fragment_delete_workouts_to_fragment_workout_landing"
+            app:destination="@id/fragment_workout_landing"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/fragment_workout_landing"/>
+        <action
+            android:id="@+id/action_fragment_delete_workouts_to_fragment_show_exercise_list"
+            app:destination="@id/fragment_show_exercise_list" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_create_exercises"
+        android:name="com.example.cbr__fitness.fragments.CreateExercise"
+        android:label="Erstellen"
+        tools:layout="@layout/fragment_create_exercise">
 
     </fragment>
 

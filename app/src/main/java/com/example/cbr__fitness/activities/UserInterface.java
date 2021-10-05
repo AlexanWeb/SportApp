@@ -40,35 +40,6 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
     // OnClick Methode der Klasse.
     public void onClick(View v) {
         switch (v.getId()) {
-
-            // Durch Klicken des imgButtonPlan gelangt der Benutzer zur Aktivität der Planconfiguration.
-            case R.id.imgButtonPlan:
-                Intent i = new Intent(UserInterface.this, ConfigurePlan.class);
-                startActivity(i);
-                break;
-
-            // Durch Klicken des imgButtonCBR gelangt der Benutzer zur Aktivität des CBR-Planners.
-            case R.id.imgButtonCBR:
-                if(MainActivity.userLogged.getPlanList().size() == 4) {
-                    Toast.makeText(this, "Pls remove Plan, Maximum reached!", Toast.LENGTH_SHORT).show();
-                } else {
-                    System.out.println(MainActivity.userLogged.getPlanList().size());
-                    i = new Intent(UserInterface.this, CBRPlanner.class);
-                    startActivity(i);
-                }
-                break;
-
-            // Durch Klicken des imgButtonSetts gelangt der Benutzer zur Aktivität der Benutzereinstellung.
-            case R.id.imgButtonSetts:
-                i = new Intent(UserInterface.this, UserSettings.class);
-                startActivity(i);
-                break;
-
-            // Durch Klicken des imgButtonLogos gelangt der Benutzer zurück zur vorherigen Aktivität.
-            case R.id.imgButtonLogo:
-                i = new Intent(UserInterface.this, MainActivity.class);
-                startActivity(i);
-                break;
         }
     }
     @Override

@@ -4,6 +4,7 @@ import android.media.audiofx.DynamicsProcessing;
 
 import com.example.cbr__fitness.activities.MainActivity;
 import com.example.cbr__fitness.data.Exercise;
+import com.example.cbr__fitness.data.ExerciseList;
 import com.example.cbr__fitness.data.ResultCaseExercise;
 import com.example.cbr__fitness.data.ResultCaseUser;
 import com.example.cbr__fitness.data.User;
@@ -17,11 +18,20 @@ import com.example.cbr__fitness.enums.WorkoutEnum;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import de.dfki.mycbr.core.DefaultCaseBase;
 import de.dfki.mycbr.core.Project;
 import de.dfki.mycbr.core.casebase.Attribute;
 import de.dfki.mycbr.core.casebase.Instance;
+import de.dfki.mycbr.core.casebase.MultipleAttribute;
 import de.dfki.mycbr.core.casebase.SymbolAttribute;
 import de.dfki.mycbr.core.model.AttributeDesc;
 import de.dfki.mycbr.core.model.BooleanDesc;
@@ -73,7 +83,7 @@ public class RetrievalUtil {
     }
 
     public List<Pair<Exercise, Double>> retrieveExercise(FitnessDBSqliteHelper helper, Exercise exercise
-        , List<EquipmentEnum> equipmentList) {
+        , List<EquipmentEnum> equipmentList, List<Integer> allIds) {
 
         List<Pair<Exercise, Double>> similarExercises = new ArrayList<>();
 
@@ -100,15 +110,15 @@ public class RetrievalUtil {
         myConceptExercise.getActiveAmalgamFct().setWeight(primaryMuscle, CBRConstants.WEIGHT_PRIMARY_MUSCLE);
         SymbolDesc secondaryMuscle = (SymbolDesc) myConceptExercise.getAllAttributeDescs().get("secondary_muscle");
         myConceptExercise.getActiveAmalgamFct().setWeight(secondaryMuscle, CBRConstants.WEIGHT_SECONDARY_MUSCLE);
-        for (SymbolAttribute s: equipment.getSymbolAttributes()) {
-            System.out.println("ALLOWED: " + s.getName());
-            System.out.println("ATTRIBUTE:: " + s.getValueAsString());
-        }
+
         try {
+            LinkedList<Attribute> attributes = new LinkedList<>();
             for (EquipmentEnum e : equipmentList) {
-                boolean added = query.addAttribute(equipment, e.getSymbol());
-                System.out.println("Successfully Added: " + added + " For value: " + e.getSymbol());
+                attributes.add(equipment.getAttribute(e.getSymbol()));
             }
+            MultipleAttribute<AttributeDesc> equipments = new MultipleAttribute<>(equipment, attributes);
+            boolean added = query.addAttribute(equipment, equipments);
+            System.out.println("Successfully Added: " + added);
             query.addAttribute(exerciseType, exercise.getType().getSymbol());
             query.addAttribute(isExplosive, exercise.getIsExplosive());
             query.addAttribute(movementType, exercise.getMovementType().getLabel());
@@ -126,16 +136,23 @@ public class RetrievalUtil {
 
         if (result.size() > 0) {
             System.out.println(">>>GOT A RESULT");
+            List<Pair<Integer, Double>> exerciseIDs = new ArrayList<>();
             for (Pair<Instance, Similarity> p : result) {
-                if (Integer.parseInt(p.getFirst().getAttributes().get(exerciseID).getValueAsString()) != exercise.getExerciseID()) {
+                if (Integer.parseInt(p.getFirst().getAttributes().get(exerciseID).getValueAsString())
+                        != exercise.getExerciseID()
+                        && !allIds.contains(Integer.parseInt(p.getFirst().getAttributes()
+                        .get(exerciseID).getValueAsString()))) {
+                    exerciseIDs.add(new Pair<>(
+                            Integer.parseInt(p.getFirst().getAttributes().get(exerciseID).getValueAsString())
+                            , p.getSecond().getValue()));
                 }
-                System.out.println("Exercise: "
-                        + Integer.parseInt(p.getFirst().getAttributes().get(exerciseID).getValueAsString())
-                        + " " + p.getSecond().getValue());
             }
+            similarExercises = helper.completeExerciseQueryResults(exerciseIDs);
         }
-
-        return similarExercises;
+        //Order the exercises left for consideration.
+        return similarExercises.stream()
+                .sorted(Comparator.comparingDouble(Pair<Exercise,Double>::getSecond).reversed())
+                .collect(Collectors.toList());
     }
 
     public List<Pair<User, Double>> retrieveUser(User loggedUser) {
@@ -167,6 +184,7 @@ public class RetrievalUtil {
         myConceptUser.getActiveAmalgamFct().setWeight(bmi, CBRConstants.WEIGHT_BMI);
         IntegerDesc userID = (IntegerDesc) myConceptUser.getAllAttributeDescs().get("userID");
         myConceptUser.getActiveAmalgamFct().setActive(userID, false);
+        myConceptUser.getActiveAmalgamFct().setType(CBRConstants.PERSON_AMALGAMATION_TYPE);
 
         try  {
             query.addAttribute(age, age.getAttribute(loggedUser.getAgeN()));

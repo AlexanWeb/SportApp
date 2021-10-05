@@ -18,18 +18,22 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:id="@+id/recycler_show_cbr_exercise_list_results"
+        android:layout_marginBottom="15dp"
         app:layout_constraintTop_toBottomOf="@id/text_label_cbr_result"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/button_confirm_pick_cbr_result"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/button_confirm_pick_cbr_result"
         android:text="@string/add_cbr_exercise_result_button"
+        android:layout_marginBottom="15dp"
         app:layout_constraintTop_toBottomOf="@id/recycler_show_cbr_exercise_list_results"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

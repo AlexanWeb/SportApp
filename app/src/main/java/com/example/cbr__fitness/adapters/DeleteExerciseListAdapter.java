@@ -12,39 +12,43 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cbr__fitness.R;
+import com.example.cbr__fitness.customViewElements.ColorChangeToggleButton;
 import com.example.cbr__fitness.data.ExerciseList;
 import com.example.cbr__fitness.enums.EquipmentEnum;
 import com.example.cbr__fitness.logic.AccountUtil;
 
-import org.w3c.dom.Text;
-
+import java.util.ArrayList;
 import java.util.List;
 
-public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapter.ExerciseListViewHolder>{
+public class DeleteExerciseListAdapter extends RecyclerView.Adapter<DeleteExerciseListAdapter.DeleteExerciseListViewHolder>{
 
     private List<ExerciseList> exerciseLists;
 
     private Context context;
 
-    public ExerciseListAdapter (List<ExerciseList> list, Context context) {
+    private List<Integer> chosenPlans;
+
+    public DeleteExerciseListAdapter (List<ExerciseList> list, Context context) {
         this.context = context;
         exerciseLists = list;
+        chosenPlans = new ArrayList<>();
     }
 
     @NonNull
     @Override
-    public ExerciseListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DeleteExerciseListAdapter.DeleteExerciseListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        View exerciseListView= inflater.inflate(R.layout.fragment_exercise_list_recycler_item_layout, parent, false);
+        View exerciseListView= inflater.inflate(R.layout.fragment_delete_exercise_list_recycler_item_layout, parent, false);
 
-        ExerciseListViewHolder viewHolder = new ExerciseListViewHolder(exerciseListView);
+        DeleteExerciseListAdapter.DeleteExerciseListViewHolder viewHolder = new DeleteExerciseListAdapter
+                .DeleteExerciseListViewHolder(exerciseListView);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ExerciseListViewHolder holder, int position) {
+    public void onBindViewHolder(DeleteExerciseListAdapter.DeleteExerciseListViewHolder holder, int position) {
         ExerciseList list = exerciseLists.get(position);
 
         TextView workout_plan_header = holder.workout_plan_header;
@@ -75,7 +79,15 @@ public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapte
         return exerciseLists.size();
     }
 
-    public class ExerciseListViewHolder extends RecyclerView.ViewHolder {
+    public List<Integer> getChosenPlans() {
+        List<Integer> toRemove = new ArrayList<>();
+        for (Integer i : chosenPlans) {
+            toRemove.add(exerciseLists.get(i).getPlan_id());
+        }
+        return toRemove;
+    }
+
+    public class DeleteExerciseListViewHolder extends RecyclerView.ViewHolder {
 
         public TextView workout_plan_header;
 
@@ -87,18 +99,27 @@ public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapte
 
         public Flow flowEquipmentList;
 
+        public ColorChangeToggleButton button;
+
         public ConstraintLayout constraintMainBody;
 
-        public ExerciseListViewHolder(View itemView) {
+        public DeleteExerciseListViewHolder(View itemView) {
             super(itemView);
 
-            workout_plan_header = itemView.findViewById(R.id.text_plan_name_exercise_list_recycler_item);
-            workout_plan_duration =  itemView.findViewById(R.id.text_duration_exercise_list_recycler_item);
-            workout_plan_prime_muscle = itemView.findViewById(R.id.text_main_muscle_exercise_list_recycler_item);
-            textWorkoutGoal = itemView.findViewById(R.id.text_goal_exercise_list_recycler_item);
-            constraintMainBody = itemView.findViewById(R.id.constraint_plan_content_exercise_list_recycler_item);
-            flowEquipmentList = itemView.findViewById(R.id.flow_equipment_exercise_list_landing_recycler_item);
-
+            workout_plan_header = itemView.findViewById(R.id.text_plan_name_delete_exercise_list_recycler_item);
+            workout_plan_duration =  itemView.findViewById(R.id.text_duration_delete_exercise_list_recycler_item);
+            workout_plan_prime_muscle = itemView.findViewById(R.id.text_main_muscle_delete_exercise_list_recycler_item);
+            textWorkoutGoal = itemView.findViewById(R.id.text_goal_delete_exercise_list_recycler_item);
+            constraintMainBody = itemView.findViewById(R.id.constraint_plan_content_delete_exercise_list_recycler_item);
+            flowEquipmentList = itemView.findViewById(R.id.flow_equipment_delete_exercise_list_recycler_item);
+            button = itemView.findViewById(R.id.color_change_toggle_delete_exercise_list_recycler_item);
+            button.setOnClickListener(v -> {
+                if (chosenPlans.contains(getAdapterPosition())) {
+                    chosenPlans.remove(getAdapterPosition());
+                } else {
+                    chosenPlans.add(getAdapterPosition());
+                }
+            });
 
         }
     }

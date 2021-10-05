@@ -24,6 +24,10 @@ public class ExerciseList extends ArrayList<Exercise> implements Parcelable {
     private int goal;
 
     private int muscle_group;
+    /**
+     * Only used and set for tracking of CBR results during testing.
+     */
+    private int uID;
 
     private List<Exercise> exercises;
 
@@ -82,12 +86,35 @@ public class ExerciseList extends ArrayList<Exercise> implements Parcelable {
         this.plan_id = plan_id;
     }
 
+    public void setuID (int uID) {
+        this.uID = uID;
+    }
+
+    public int getuID(){
+        return uID;
+    }
+
+    public String toLogOutput() {
+        return "ID: " + plan_id + " NAME: " + plan_name + " USER: " + uID + " MUSCLE: "
+                + getMuscle_group().getLabel() + " GOAL: " + getGoal().getLabel() + " EQUIPMENT: "
+                + neededEquipmentToString();
+    }
+
     public MuscleGroupEnum getMuscle_group() {
         return MuscleGroupEnum.getEnumByID(muscle_group);
     }
 
     public void setMuscle_group(int muscle_group) {
         this.muscle_group = muscle_group;
+    }
+
+    public String neededEquipmentToString () {
+        StringBuilder builder = new StringBuilder();
+        for (EquipmentEnum e :getNeededEquipment()) {
+            builder.append(", " + e.getLabel());
+        }
+
+        return builder.toString();
     }
 
     public int getDuration() {
@@ -108,6 +135,16 @@ public class ExerciseList extends ArrayList<Exercise> implements Parcelable {
         }
 
         return equipment;
+    }
+
+    public List<Integer> getAllExerciseIDs () {
+        List<Integer> allIds = new ArrayList<>();
+
+        for (Exercise e : exercises) {
+            allIds.add(e.getExerciseID());
+        }
+
+        return allIds;
     }
 
     public List<Exercise> getExercises() {

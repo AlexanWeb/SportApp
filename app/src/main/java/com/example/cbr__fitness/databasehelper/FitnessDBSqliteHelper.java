@@ -2,6 +2,7 @@ package com.example.cbr__fitness.databasehelper;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.AbstractWindowedCursor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -21,8 +22,11 @@ import com.example.cbr__fitness.enums.MuscleEnum;
 import com.example.cbr__fitness.enums.WorkoutEnum;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import de.dfki.mycbr.core.casebase.Instance;
+import de.dfki.mycbr.core.similarity.Similarity;
 import de.dfki.mycbr.util.Pair;
 
 public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
@@ -217,10 +221,10 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
      * @return The list of all plans the user got
      */
     public List<ExerciseList> getExerciseListsByUser (int userId) {
-        String[] values = {String.valueOf(userId)};
+
         SQLiteDatabase db = this.getReadableDatabase();
 
-        List<ExerciseList> exercises = getExerciseListsByUser(db, userId);
+        List<ExerciseList> exercises = getExerciseListsByUser(db, userId, false);
 
         db.close();
         return exercises;
@@ -232,8 +236,9 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db  = getReadableDatabase();
 
         for (Pair<User, Double> p : users) {
-            List<ExerciseList>  temp = getExerciseListsByUser(db, p.getFirst().getUid());
+            List<ExerciseList>  temp = getExerciseListsByUser(db, p.getFirst().getUid(), true);
             for (ExerciseList e : temp  ) {
+                e.setuID(p.getFirst().getUid());
                 plans.add(new Pair<>(e, p.getSecond()));
             }
         }
@@ -242,22 +247,18 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
         return plans;
     }
 
-    public List<ExerciseList> getExerciseListsByUser (SQLiteDatabase db, int uID) {
+    public List<ExerciseList> getExerciseListsByUser (SQLiteDatabase db, int uID, boolean includeDeleted) {
         List<ExerciseList> exercises = new ArrayList<>();
         String[] values = {String.valueOf(uID)};
-
-        Cursor cursor = db.rawQuery(SQL_GET_PLANS_BY_USER_ID,values);
+        String query = SQL_GET_PLANS_BY_USER_ID;
+        if (!includeDeleted) {
+            query += " AND plans." + FitnessDBContract.PlanEntry.COLUMN_NAME_DELETED + " = ?";
+            values = new String[]{String.valueOf(uID), "0"};
+        }
+        Cursor cursor = db.rawQuery(query ,values);
 
         if (cursor.getCount() > 0) {
             while(cursor.moveToNext()) {
-//                System.out.println("COLUMNS: " + cursor.getCount()
-//                        + " NAMES: " + cursor.getInt(0) + ", "
-//                        + cursor.getInt(1) + ", "
-//                        + cursor.getInt(2) + ", "
-//                        + cursor.getString(3) + ", "
-//                        + cursor.getInt(4) + ", "
-//                        + cursor.getInt(5) + ", "
-//                        + cursor.getInt(6) + ", ");
                 //Gets plan ID, goal, sub goal and the name in that order
                 exercises.add(new ExerciseList(cursor.getInt(2)
                         , cursor.getInt(4), cursor.getInt(5)
@@ -291,10 +292,28 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
         return exercises;
     }
 
+    public void deletePlans (List<Integer> plansToDelete) {
+        if (plansToDelete.size() > 0) {
+
+            SQLiteDatabase db = getWritableDatabase();
+
+            for (Integer i : plansToDelete) {
+                ContentValues values = new ContentValues();
+                values.put(FitnessDBContract.PlanEntry.COLUMN_NAME_DELETED, 1);
+
+                db.update(FitnessDBContract.PlanEntry.TABLE_NAME, values
+                        , FitnessDBContract.PlanEntry.COLUMN_NAME_PID + " = ?"
+                        ,new String[]{Integer.toString(i)});
+            }
+
+            db.close();
+        }
+    }
+
     /**
      * Creates exercises from a cursor assumes an inner join on plan_exercises and exercises.
      *  Order of fields: pid, eid, sets, reps, break, weight, eid, title, prime_muscle, secondary_muscle,exercise_type
-     *  explanation, illustration_link, equipment, duration_rep, movement_type, is_explosive
+     *  explanation, illustration_link, equipment, duration_rep, movement_type, is_explosive, is_bodyweight
      * @param cursor A cursor containing all the data for exercises
      * @return  A list with all the exercises the cursor held
      */
@@ -328,7 +347,7 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
                     , cursor.getInt(14), ExerciseTypeEnum.getEnumByInt(cursor.getInt(10))
                     , EquipmentEnum.getEnumById(cursor.getInt(13))
                     , cursor.getString(11),MovementTypeEnum.getEnumById(cursor.getInt(15))
-                    , (cursor.getInt(16) == 1))); // done as 0 represents false as would be the expression.
+                    , (cursor.getInt(16) == 1), (cursor.getInt(17) == 1))); // done as 0 represents false as would be the expression.
 
             System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<:  EXERCISE WEIGHT " + cursor.getInt(6));
         }
@@ -588,7 +607,8 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
             FitnessDBContract.ExerciseEntry.COLUMN_NAME_EQUIPMENT,
             FitnessDBContract.ExerciseEntry.COLUMN_NAME_ILLUSTRATION_LINK,
             FitnessDBContract.ExerciseEntry.COLUMN_NAME_DURATION_REP,
-            FitnessDBContract.ExerciseEntry.COLUMN_NAME_IS_EXPLOSIVE
+            FitnessDBContract.ExerciseEntry.COLUMN_NAME_IS_EXPLOSIVE,
+            FitnessDBContract.ExerciseEntry.COLUMN_NAME_IS_BODYWEIGHT,
         };
 
         Cursor cursor = doAndroidQuery(db,FitnessDBContract.ExerciseEntry.TABLE_NAME, projection, null
@@ -601,7 +621,8 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
                     , MuscleEnum.getEnumByInt(cursor.getInt(3)), cursor.getInt(9)
                     , ExerciseTypeEnum.getEnumByInt(cursor.getInt(4))
                     , EquipmentEnum.getEnumById(cursor.getInt(7)), cursor.getString(5)
-                    , MovementTypeEnum.getEnumById(cursor.getInt(6)), (cursor.getInt(10)==1)));
+                    , MovementTypeEnum.getEnumById(cursor.getInt(6))
+                    , (cursor.getInt(10)==1), (cursor.getInt(11)==1)));
         }
 
         db.close();
@@ -640,6 +661,238 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    /**
+     * This method takes in the result of a CBR query for exercises and completes it by getting
+     * the complete exercises from the DB. It is handled here to prevent from opening and
+     * closing the db connection multiple times.
+     * @param result
+     * @return
+     */
+    public List<Pair<Exercise, Double>> completeExerciseQueryResults (List<Pair<Integer, Double>> result) {
+        List<Pair<Exercise, Double>> asList = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        for (Pair<Integer, Double> p : result) {
+            asList.add(new Pair<>(getExerciseByID(db, p.getFirst()), p.getSecond()));
+        }
+
+        db.close();
+        return  asList;
+    }
+
+    public Exercise getExerciseByID (SQLiteDatabase db, int exerciseID) {
+        Exercise exercise = null;
+        String[] projection = {
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_EID,
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_TITLE,
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_PRIME_MUSCLE,
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_SECONDARY_MUSCLE,
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_EXERCISE_TYPE,
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_EXPLANATION,
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_ILLUSTRATION_LINK,
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_EQUIPMENT,
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_DURATION_REP,
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_MOVEMENT_TYPE,
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_IS_EXPLOSIVE,
+                FitnessDBContract.ExerciseEntry.COLUMN_NAME_IS_BODYWEIGHT
+        };
+
+        String selection = FitnessDBContract.ExerciseEntry.COLUMN_NAME_EID + " = ?";
+        String[] selectionParams = {Integer.toString(exerciseID)};
+
+
+        Cursor cursor = doAndroidQuery(db, FitnessDBContract.ExerciseEntry.TABLE_NAME, projection
+                , selection, selectionParams, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            exercise = new Exercise(cursor.getInt(0), cursor.getString(1)
+                    , MuscleEnum.getEnumByInt(cursor.getInt(2))
+                    , MuscleEnum.getEnumByInt(cursor.getInt(3))
+                    , cursor.getInt(8), ExerciseTypeEnum.getEnumByInt(cursor.getInt(4))
+                    , EquipmentEnum.getEnumById(cursor.getInt(7)), cursor.getString(5)
+                    , MovementTypeEnum.getEnumById(cursor.getInt(9))
+                    , (cursor.getInt(10) == 1), (cursor.getInt(11) == 1));
+        }
+
+        cursor.close();
+        return exercise;
+    }
+
+    public void updatePlanExerciseRelation (int pid, int eid, int oldEid) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(FitnessDBContract.PlanExerciseRelationEntry.COLUMN_NAME_EID, eid);
+
+        db.update(FitnessDBContract.PlanExerciseRelationEntry.TABLE_NAME, values
+                , FitnessDBContract.PlanExerciseRelationEntry.COLUMN_NAME_EID + " = ? AND "
+                        + FitnessDBContract.PlanExerciseRelationEntry.COLUMN_NAME_PID + " = ?"
+                , new String[]{Integer.toString(oldEid), Integer.toString(pid)});
+
+        db.close();
+    }
+
+    /**
+     * Returns a query with seven columns: uid, pid, pid, name, goal, sub_goal, rating
+     */
+    private static final String SQL_GET_PLAN_BY_ID= "SELECT * FROM "
+            + FitnessDBContract.UserPlanRelation.TABLE_NAME + " rel INNER JOIN "
+            + FitnessDBContract.PlanEntry.TABLE_NAME + " plans ON "
+            + "rel." + FitnessDBContract.UserPlanRelation.COLUMN_NAME_PID + "="
+            + "plans." + FitnessDBContract.PlanEntry.COLUMN_NAME_PID + " WHERE "
+            + "rel." + FitnessDBContract.UserPlanRelation.COLUMN_NAME_UID + " = ? AND "
+            + "plans." + FitnessDBContract.UserPlanRelation.COLUMN_NAME_PID + " = ?";
+
+    public ExerciseList getExerciseListByID(int pid, int uid, int eid) {
+        SQLiteDatabase db = getReadableDatabase();
+
+        System.out.println("GEtting new plan for :" + pid + " udi: " + uid);
+
+        String[] values = { Integer.toString(uid), Integer.toString(pid) };
+
+        ExerciseList plan = null;
+
+        Cursor cursor = db.rawQuery(SQL_GET_PLAN_BY_ID, values);
+        while(cursor.moveToNext()) {
+            System.out.println(cursor.getColumnName(0));
+            System.out.println(cursor.getColumnName(1));
+            System.out.println(cursor.getColumnName(2));
+            System.out.println(cursor.getColumnName(3));
+            System.out.println(cursor.getColumnName(4));
+            System.out.println(cursor.getColumnName(5));
+            System.out.println(cursor.getColumnName(6));
+            plan = new ExerciseList(cursor.getInt(2)
+                    , cursor.getInt(4), cursor.getInt(5)
+                    ,cursor.getString(3));
+        }
+        cursor.close();
+
+        String completedQuery = SQL_GET_EXERCISES_BY_PLANS;
+        completedQuery += "?)";
+        Cursor exerciseQuery = db.rawQuery(completedQuery, new String[]{Integer.toString(plan.getPlan_id())});
+        List<Exercise> exercises = cursorToExercises(exerciseQuery);
+
+        for (Exercise e : exercises) {
+            plan.addExercise(e);
+        }
+        exerciseQuery.close();
+        db.close();
+        return plan;
+    }
+
+    public void updateUserProfile(int userID, List<Integer> addedEquipment, List<Integer> removedEquipment
+            , List<Integer> addedLimitations, List<Integer> removedLimitations, int age, int weight
+            , int height, int gender, int workoutType) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        for (Integer i : addedEquipment) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(FitnessDBContract.UserEquipmentRelation.COLUMN_NAME_UID, userID);
+            contentValues.put(FitnessDBContract.UserEquipmentRelation.COLUMN_NAME_EQ_ID, i);
+            db.insert(FitnessDBContract.UserEquipmentRelation.TABLE_NAME, null, contentValues);
+        }
+
+        for (Integer i : addedLimitations) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(FitnessDBContract.LimitationsUserRelation.COLUMN_NAME_UID, userID);
+            contentValues.put(FitnessDBContract.LimitationsUserRelation.COLUMN_NAME_LID, i);
+            db.insert(FitnessDBContract.LimitationsUserRelation.TABLE_NAME, null, contentValues);
+        }
+
+        for (Integer i : removedEquipment) {
+            String where = FitnessDBContract.UserEquipmentRelation.COLUMN_NAME_UID + " = ? AND "
+                    + FitnessDBContract.UserEquipmentRelation.COLUMN_NAME_EQ_ID + " = ?";
+            db.delete(FitnessDBContract.UserEquipmentRelation.TABLE_NAME, where
+                    , new String[]{ Integer.toString(userID), Integer.toString(i)});
+        }
+
+        for (Integer i : removedLimitations) {
+            String where = FitnessDBContract.LimitationsUserRelation.COLUMN_NAME_UID + " = ? AND "
+                    + FitnessDBContract.LimitationsUserRelation.COLUMN_NAME_LID + " = ?";
+            db.delete(FitnessDBContract.LimitationsUserRelation.TABLE_NAME, where
+                    , new String[]{ Integer.toString(userID), Integer.toString(i)});
+        }
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(FitnessDBContract.UserEntry.COlUMN_NAME_HEIGHT, height);
+        contentValues.put(FitnessDBContract.UserEntry.COLUMN_NAME_AGE, age);
+        contentValues.put(FitnessDBContract.UserEntry.COlUMN_NAME_WEIGHT, weight);
+        contentValues.put(FitnessDBContract.UserEntry.COLUMN_NAME_GENDER, gender);
+        contentValues.put(FitnessDBContract.UserEntry.COLUMN_NAME_TRAINING_TYPE, workoutType);
+
+        String where = FitnessDBContract.UserEntry.COLUMN_NAME_UID + " = ?";
+
+        db.update(FitnessDBContract.UserEntry.TABLE_NAME, contentValues, where, new String[]{Integer.toString(userID)} );
+
+        db.close();
+    }
+
+    public List<Exercise> getAllPossibleExercisesForUser(int muscleGroupID, List<EquipmentEnum> equipments) {
+        SQLiteDatabase db = getReadableDatabase();
+        boolean first = true;
+
+        StringBuilder selection = new StringBuilder(FitnessDBContract.ExerciseEntry.COLUMN_NAME_EQUIPMENT + " IN(");
+        for (EquipmentEnum e : equipments) {
+            if (first) {
+                selection.append("?");
+                first = false;
+            } else {
+                selection.append(",?");
+            }
+        }
+        selection.append(")");
+
+        String[] selectionArgs = new String[equipments.size()];
+        for (int i = 0; i < equipments.size(); i++) {
+            selectionArgs[i] = Integer.toString(equipments.get(i).getID());
+        }
+
+        Cursor cursor = doAndroidQuery(db, FitnessDBContract.ExerciseEntry.TABLE_NAME, null, selection.toString()
+                , selectionArgs, null ,null,null);
+
+        List<Exercise> exercises = cursorToBasicExercise(cursor);
+
+        db.close();
+        return  exercises;
+    }
+    /**
+     * Order of fields: pid, eid, sets, reps, break, weight, eid, title, prime_muscle, secondary_muscle,exercise_type
+     * explanation, illustration_link, equipment, duration_rep, movement_type, is_explosive, is_bodyweight
+     */
+    public List<Exercise> cursorToBasicExercise(Cursor cursor){
+        List<Exercise> exercises = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+
+            System.out.println("COLUMNS: " + cursor.getColumnCount()
+                    + " NAMES: " + cursor.getColumnName(0) + ", "  //int
+                    + cursor.getColumnName(1) + ", "               //int
+                    + cursor.getColumnName(2) + ", "               //int
+                    + cursor.getColumnName(3) + ", "               //int
+                    + cursor.getColumnName(4) + ", "               //int
+                    + cursor.getColumnName(5) + ", "            //String
+                    + cursor.getColumnName(6) + ", "               //int
+                    + cursor.getColumnName(7) + ", "            //String
+                    + cursor.getColumnName(8) + ", "               //int
+                    + cursor.getColumnName(9) + ", "               //int
+                    + cursor.getColumnName(10) + ", "              //int
+                    + cursor.getColumnName(11) + ", "           //String
+                );
+            //pid, eid, sets, reps, break, weight, eid, title, prime_muscle, exercise_type
+            // explanation, illustration_link, equipment, duration_rep
+ // done as 0 represents false as would be the expression.
+            exercises.add(new Exercise(0, cursor.getInt(0)
+                    , cursor.getString(1), 0, 0, 0, 0
+                    , MuscleEnum.getEnumByInt(cursor.getInt(2))
+                    , MuscleEnum.getEnumByInt(cursor.getInt(3))
+                    , cursor.getInt(8), ExerciseTypeEnum.getEnumByInt(cursor.getInt(4))
+                    , EquipmentEnum.getEnumById(cursor.getInt(7))
+                    , cursor.getString(5), MovementTypeEnum.getEnumById(cursor.getInt(9))
+                    , (cursor.getInt(10) == 1), (cursor.getInt(11) == 1)));
+        }
+
+        return exercises;
+    }
 
     /**
      * Method to aggregate the DB.query calls that can be done via the android provided SQL helper.

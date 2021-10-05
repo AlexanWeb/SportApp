@@ -7,6 +7,7 @@ import com.example.cbr__fitness.enums.GenderEnum;
 import com.example.cbr__fitness.enums.LimitationEnum;
 import com.example.cbr__fitness.enums.WorkoutEnum;
 import com.example.cbr__fitness.interfaces.ToCaseCsvInterface;
+import com.example.cbr__fitness.logic.AccountUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +126,6 @@ public class User implements ToCaseCsvInterface {
         return equipments;
     }
 
-
     public String toCsvCase() {
         return  uid + ";" + ageN + ";" + genderN.getLabel() +
                 ";" + weightN + ";" + height + ";" + getBMI() +
@@ -135,7 +135,8 @@ public class User implements ToCaseCsvInterface {
     @NonNull
     public String toString() {
         StringBuilder base = new StringBuilder("USERID: " + uid  + " USER: " + userName + " AGE: " + ageN
-                + " GENDER: " + genderN.toString() + " WEIGHT: " + weightN + " WORKOUTTYPE: " + workoutTypeN.toString());
+                + " GENDER: " + genderN.toString() + " WEIGHT: " + weightN + " HEIGHT: " + height
+                + " BMI : " + getBMI() + " WORKOUT_TYPE: " + workoutTypeN.toString());
         for (LimitationEnum l : limitations) {
             base.append(", ").append(l.getLabel());
         }
@@ -148,7 +149,7 @@ public class User implements ToCaseCsvInterface {
     public int getHeight() { return height; }
 
     public float getBMI() {
-        return (weightN / (height* 1.0f) / (height * 1.0f)) * 10000;
+        return AccountUtil.getBMI(weightN, height);
     }
 
 

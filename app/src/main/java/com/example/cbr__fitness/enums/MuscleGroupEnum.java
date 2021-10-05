@@ -12,6 +12,8 @@ public enum MuscleGroupEnum implements EnumInterface {
     ABS(4, "Bachmuskeln"),
     LEGS(5, "Beine"),
     BACK(6, "Rücken"),
+    UPPER_BODY(8, "Oberkörper"),
+    LOWER_BODY(9, "Unterkörper"),
     WHOLE(7, "Ganzkörper");
 
     private String label;

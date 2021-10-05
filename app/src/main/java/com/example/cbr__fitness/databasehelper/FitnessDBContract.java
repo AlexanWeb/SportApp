@@ -49,6 +49,7 @@ public class FitnessDBContract {
         public static final String COLUMN_NAME_DURATION_REP = "duration_rep";
         public static final String COLUMN_NAME_MOVEMENT_TYPE = "movement_type";
         public static final String COLUMN_NAME_IS_EXPLOSIVE = "is_explosive";
+        public static final String COLUMN_NAME_IS_BODYWEIGHT = "is_bodyweight";
     }
 
     public static final String SQL_CREATE_EXERCISE = "CREATE TABLE " + ExerciseEntry.TABLE_NAME
@@ -63,6 +64,7 @@ public class FitnessDBContract {
             ExerciseEntry.COLUMN_NAME_DURATION_REP + " INTEGER NOT NULL DEFAULT (5)," +//as time in mm:ss
             ExerciseEntry.COLUMN_NAME_MOVEMENT_TYPE + " INTEGER NOT NULL DEFAULT (1)," +
             ExerciseEntry.COLUMN_NAME_IS_EXPLOSIVE + " INTEGER NOT NULL DEFAULT (0)," +
+            ExerciseEntry.COLUMN_NAME_IS_BODYWEIGHT + " INTEGER NOT NULL DEFAULT (0)," +
             "FOREIGN KEY(" + ExerciseEntry.COLUMN_NAME_EQUIPMENT + ") REFERENCES " + EquipmentEntry.TABLE_NAME + "(" + EquipmentEntry.COLUMN_NAME_EQ_ID + ")"+
             ")";
 
@@ -99,6 +101,7 @@ public class FitnessDBContract {
         public static final String COLUMN_NAME_GOAL = "goal";
         public static final String COLUMN_NAME_MUSCLE_GROUP = "muscle_group";
         public static final String COLUMN_NAME_RATING = "rating";
+        public static final String COLUMN_NAME_DELETED = "deleted";
     }
 
     public static final String SQL_CREATE_PLAN = "CREATE TABLE " + PlanEntry.TABLE_NAME
@@ -106,7 +109,8 @@ public class FitnessDBContract {
             PlanEntry.COLUMN_NAME_NAME + " TEXT NOT NULL DEFAULT 'NamelessPlan'," +
             PlanEntry.COLUMN_NAME_GOAL + " INTEGER NOT NULL DEFAULT(0)," + //TODO: List of goals as a table to translate int to goals
             PlanEntry.COLUMN_NAME_MUSCLE_GROUP + " INTEGER NOT NULL DEFAULT(0)," +
-            PlanEntry.COLUMN_NAME_RATING + " INTEGER NOT NULL DEFAULT(3)" +
+            PlanEntry.COLUMN_NAME_RATING + " INTEGER NOT NULL DEFAULT(3)," +
+            PlanEntry.COLUMN_NAME_DELETED + " INTEGER NOT NULL DEFAULT(0)" +
             ")";
 
     public static final String SQL_DELETE_PLAN = "DROP TABLE IF EXISTS " + PlanEntry.TABLE_NAME;
@@ -232,16 +236,36 @@ public class FitnessDBContract {
             ",(5,1), (5,4),  (5,9)" +
             ",(3,1), (3,5), (3,6), (3,8)" +
             ",(4,1), (4,2), (4,7), (4,6)" +
+            ",(6,1), (6,3), (6,8)" +
+            ",(7,1), (7,10)" +
+            ",(8,1)" +
+            ",(9,1), (9,5)" +
+            ",(10,1), (10,4), (10,7)" +
+            ",(11,1), (11,2)" +
+            ",(12,1), (12,2)" +
+            ",(13,1), (13,2), (13,10)" +
+            ",(14,1), (14,2), (14,7), (14,8), (14, 9)" +
+            ",(15,1), (15,4), (15,5), (15,6)" +
+            ",(16,1), (16,2)" +
+            ",(17,1)" +
+            ",(18,1)" +
+            ",(19,1), (19,2)" +
+            ",(20,1), (20,2), (20,5), (20,7), (20,8),(20, 9)" +
+            ",(21,1)" +
+            ",(22,1), (22,2)" +
+            ",(23,1), (23,2), (23,10)" +
+            ",(24,1), (24,10)" +
+            ",(25,1), (25,9), (25,10)" +
             ";";
 
     public static final String SQL_INSERT_EQUIPMENT = "INSERT INTO "
             + EquipmentEntry.TABLE_NAME + " (" + EquipmentEntry.COLUMN_NAME_LABEL + ") " +
-            "VALUES ('Keins'), ('Fitness Studio Mitgliedschaft'), ('Hanteln'), ('Theraband'), ('Dumbells'), ('Klimmzugstange')" +
-            ",('Hantelbank'), ('Langhantel'), ('DipBars');";
+            "VALUES ('Keins'), ('Fitness Studio Mitgliedschaft'), ('Hanteln'), ('Theraband'), ('Kettelbell'), ('Klimmzugstange')" +
+            ",('Hantelbank'), ('Langhantel'), ('DipBars'), ('Bench');";
 
     public static final String SQL_INSERT_LIMITATIONS= "INSERT INTO "
             + LimitationsEntry.TABLE_NAME + " (" + LimitationsEntry.COLUMN_NAME_LIMITATION + ") " +
-            "VALUES ('Elbows'), ('Wrists'), ('Shoulder'), ('Knees'), ('Spine');";
+            "VALUES ('Elbows'), ('Wrists'), ('Shoulder'), ('Knees'), ('Spine'), ('Hüften');";
 
     public static final String SQL_INSERT_ROLLS ="INSERT INTO "
             + RollEntry.TABLE_NAME + " (" + RollEntry.COLUMN_NAME_ROLL + ") " +
@@ -260,23 +284,62 @@ public class FitnessDBContract {
             ",('Jenny', 'Jenny', 26, 2, 2, 65, 165)" +
             ",('Jeremy', 'Jeremy', 35, 1, 3, 100, 190)" +
             ",('Markus', 'Markus', 56, 1, 1, 85, 173)" +
+            ",('Torsten', 'Torsten', 25, 1, 1, 120, 185)" +
+            ",('Lukas', 'Lukas', 24, 1, 2, 105, 178)" +
+            ",('Tim', 'Tim', 34, 1, 3, 90, 182)" +
+            ",('Tobi', 'Tobi', 29, 1, 2, 68, 169)" +
+            ",('Karl', 'Karl', 18, 1, 2, 73, 172)" + // 10
+            ",('James', 'James', 19, 1, 1, 84, 186)" +
+            ",('Jake', 'Jake', 21, 1, 1, 91, 162)" +
+            ",('Markus', 'Markus', 42, 1, 3, 103, 176)" +
+            ",('Lars', 'Lars', 39, 1, 2, 75, 165)" +
+            ",('Lara', 'Lara', 18, 2, 2, 53, 160)" +
+            ",('Luna', 'Luna', 26, 2, 1, 82, 183)" +
+            ",('Jessika', 'Jessika', 24, 2, 1, 46, 149)" +
+            ",('Aria', 'Aria', 21, 2, 1, 103, 173)" +
+            ",('Mira', 'Mira', 31, 2, 1, 61, 162)" +
+            ",('Lisa', 'Lisa', 19, 2, 2, 72, 168)" + //20
+            ",('Nina', 'Nina', 23, 2, 1, 58, 159)" +
+            ",('Jin', 'Jin', 33, 2, 2, 78, 173)" +
+            ",('An', 'An', 46, 2, 2, 55, 153)" +
+            ",('Hanna', 'Hanna', 51, 2, 1, 94, 176)" +
+            ",('Mara', 'Mara', 43, 2, 1, 80, 162)" +  //25
             ";";
 
     public static final String SQL_INSERT_USER_ROLL = "INSERT INTO "
             + RollUserRelation.TABLE_NAME + "(" + RollUserRelation.COLUMN_NAME_UID + ", " + RollUserRelation.COLUMN_NAME_RID +")"
-            + "VALUES (1, 1)" +
-            ",(1, 2)" +
-            ", (1, 3)" +
+            + "VALUES (1, 1), (1, 2), (1, 3)" +
             ", (2, 1)" +
             ", (3, 1)" +
             ", (4, 1)" +
             ", (5, 1)" +
+            ", (6, 1)" +
+            ", (7, 1)" +
+            ", (8, 1)" +
+            ", (9, 1)" +
+            ", (10, 1)" + //10
+            ", (11, 1)" +
+            ", (12, 1)" +
+            ", (13, 1)" +
+            ", (14, 1)" +
+            ", (15, 1)" +
+            ", (16, 1)" +
+            ", (17, 1)" +
+            ", (18, 1)" +
+            ", (19, 1)" +
+            ", (20, 1)" + //20
+            ", (21, 1)" +
+            ", (22, 1)" +
+            ", (23, 1)" +
+            ", (24, 1)" +
+            ", (25, 1)" + //25
             ";";
 
     public static final String SQL_INSERT_USER_LIMITATION_REL = "INSERT INTO "
             + LimitationsUserRelation.TABLE_NAME + "(" + LimitationsUserRelation.COLUMN_NAME_UID
             + ", " + LimitationsUserRelation.COLUMN_NAME_LID + ") " +
-            "VALUES (1, 3),(4, 2), (4, 4), (5, 5), (5, 4);";
+            "VALUES (1, 3),(4, 2), (4, 4), (5, 5), (5, 4), (6,4), (8,2), (8, 3), (12,5), (13, 3)" +
+            ",(18, 1), (18,2), (23, 1);";
 
     public static final String SQL_INSERT_EXERCISES = "INSERT INTO "
             + ExerciseEntry.TABLE_NAME + "(" + ExerciseEntry.COLUMN_NAME_TITLE
@@ -289,20 +352,55 @@ public class FitnessDBContract {
             +"," + ExerciseEntry.COLUMN_NAME_ILLUSTRATION_LINK
             +"," + ExerciseEntry.COLUMN_NAME_MOVEMENT_TYPE
             +"," + ExerciseEntry.COLUMN_NAME_IS_EXPLOSIVE
-            + ") VALUES ('Push-Up', 5, 2, 1, 'Begeben sie sich in eine liegende Position mit dem " +
+            +"," + ExerciseEntry.COLUMN_NAME_IS_BODYWEIGHT
+            + ") VALUES ('Push-Up', 3, 2, 1, 'Begeben sie sich in eine liegende Position mit dem " +
             "Gesicht nach unten, platzieren sie ihre Arme schulterbreit unter den Schultern und" +
             " ihre Fuesse huefstbreit. Spannen sie ihre Bauchmuseln und ihre Glutes an. Druecken sie" +
             "sich mit ihren Armen nach oben und lassen sich dann wieder Runter. Achten sie auf einen" +
-            "geraden Ruecken.', 4, 6, 'LINK', 1, 0)," +
-            "('Clapping Push-Up', 4, 2, 1, 'Begeben sie sich in eine liegende Position mit dem " +
+            "geraden Ruecken.', 4, 6, 'LINK', 1, 0, 1)" +
+            ",('Clapping Push-Up', 3, 2, 1, 'Begeben sie sich in eine liegende Position mit dem " +
             "Gesicht nach unten, platzieren sie ihre Arme schulterbreit unter den Schultern und" +
             " ihre Fuesse huefstbreit. Spannen sie ihre Bauchmuseln und ihre Glutes an. Druecken sie" +
             "sich schnell nach oben, so dass sie bevor sie wieder absinken in die Haende klatschen" +
             " koennen. Nach dem klatschen die Arme wieder in die Ausgangspositions um den abstieg " +
-            "abzufangen. Achten sie auf einen geraden Ruecken.', 4, 6, 'LINK', 1, 0)" +
+            "abzufangen. Achten sie auf einen geraden Ruecken.', 4, 6, 'LINK', 1, 1, 1)" +
             ",('Dip', 5, 2, 9, 'Beidseitig die Stangen greifen, eine gerade Haltung einnehmen, dann" +
             "den Koerper langsam und kontrolliert durch das Biegen der Arme senken und anschliessend" +
-            "wieder hochdruecken', 4, 6, 'LINK', 1, 0)" +
+            "wieder hochdruecken', 2, 4, 'LINK', 1, 0, 1)" +
+            ",('Bench Dip', 5, 2, 10, 'Platzieren sie sich mit dem Rücken zu einer Bank, setzen " +
+            "sie sich davor, platzieren ihre Hände mit den Fingern nach vorne und drücken sich" +
+            "nur mit den Armen hoch.', 2, 4, 'LINK', 1, 0, 1)" +
+            ",('Biceps Curls', 3, 1, 3, 'Stehen sie gerade, nehmen sie eine Handel, halten sie den " +
+            "Arm mit der Hanel an ihrer Seite, die Daumen nach außen, heben sie die Handel bis " +
+            "zum höchsten Punk und senken sie die Hantel wiede.', 1, 14, 'LINK', 2, 0, 0)" +
+            ",('Bench Press', 6, 2, 7, 'Stehen sie gerade, nehmen sie eine Handel, halten sie den " +
+            "Arm mit der Hanel an ihrer Seite, die Daumen nach außen, heben sie die Handel bis " +
+            "zum höchsten Punk und senken sie die Hantel wiede.', 4, 6, 'LINK', 1, 0, 0)" +
+            ",('Archer Push-Up', 4, 2, 1, 'ArcherPushUp.', 4, 6, 'LINK', 1, 0, 1)" +
+            ",('Cable Lateral-Raise', 5, 1, 2, 'Stehen seitlich ziehen.', 6, 14, 'LINK', 2, 0, 0)"+
+            ",('Dumbell Lateral Raise', 3, 2, 3, 'Seitlich hanteln heben.', 6, 11, 'LINK', 2, 0, 0)" +
+            ",('Dumbell Front Raise', 3, 2, 3, 'Frontal hanteln heben.', 6, 11, 'LINK', 2, 0, 0)" +
+            ",('Bent-Over Dumbell Fly', 4, 2, 3, 'Vorbeugen hanteln seitlich heben.', 6, 11, 'LINK', 2, 0, 0)" +
+            ",('Upright Dumbell Raise', 3, 2, 3, 'Frontal hanteln heben. Ellbogen außen.', 6, 11, 'LINK', 2, 0,0)" +
+            ",('MachineShoulder Press', 4, 2, 2, 'Machine Schulter Vordruecken.', 6, 2, 'LINK', 1, 0,0)" +
+            ",('Steated Barebell Military Press', 3, 2, 8, 'Hantel ueber Kopf druecken.', 6, 1, 'LINK', 1, 0,0)" +
+            ",('Barebell Shrug ', 3, 1, 8, 'Gerade stehen, Schultern heben.', 11, 14, 'LINK', 2, 0,0)" +
+            ",('Machine Chest Press', 4, 1, 2, 'Machine arme nach Vorne drücken.', 4, 2, 'LINK', 2, 0,0)" +
+            ",('Machine Chest Fly ', 3, 1, 2, 'Maschine Arm frontal zusammenführen.', 4, 6, 'LINK', 1, 0,0)" +
+            ",('Lying Chest Fly ', 3, 1, 3, 'Auf Rücken Hanteln oben zusammenführen.', 4, 6, 'LINK', 2, 0,0)" +
+            ",('Dumbell Bench Press ', 3, 1, 3, 'Gerade stehen, Schultern heben.', 4, 6, 'LINK', 2, 0,0)" +
+            ",('Machine Seateted Row ', 4, 2, 2, 'Gerade stehen, Schultern heben.', 15, 11, 'LINK', 2, 0,0)" +
+            ",('Lat-Pulldown ', 4, 2, 2, 'Stange von oben herrunter ziehen.', 15, 1, 'LINK', 2, 0,0)" +
+            ",('Asissted Pull-Up', 5, 2, 2, 'Asisstet Pullup Machine nutzen.', 15, 1, 'LINK', 2, 0, 1)" +
+            ",('Pull Up', 4, 2, 6, 'Pull Up', 15, 1, 'LINK', 2, 0, 1)" +
+            ",('Dumbell single arm Row', 2, 2, 3, 'Vorbeugen, arm seitlich geradte hochiehen.', 15, 1, 'LINK', 2, 0 ,1)" +
+            ",('Machine Steaded Triceps Push-Down', 3, 2, 2, 'user Machine', 2, 14, 'LINK', 1, 0, 0)" +
+            ",('Cable Triceps Extension', 3, 2, 2, 'user Machine', 2, 14, 'LINK', 1, 0, 0)" +
+            ",('Dumbell Hammer Curl', 2, 2, 3, 'user Machine', 1, 3, 'LINK', 1, 0, 0)" + //Strength training page 205
+            ",('Diamond Push Up', 2, 2, 1, 'Diamond Push Up', 2, 4, 'LINK', 1, 0, 1)" +
+            ",('Pull Up Superman', 3, 2, 1, 'Auf bauch legen, Oberkörper anheben, Pull Up movement', 11, 12, 'LINK', 2, 0, 1)" +
+            ",('Back Crunch', 2, 1, 1, 'Auf bauch legen, Oberkörper und beine hochziehehn', 12, 15, 'LINK', 2, 0, 1)" +
+            ",('Rotational Plank', 3, 2, 1, 'Plank, dann einen Arm Zur decke Körper drehen', 5, 6, 'LINK', 2, 0, 1)" +
             ";";
 
     public static final String SQL_INSERT_PLAN = "INSERT INTO "
@@ -310,39 +408,57 @@ public class FitnessDBContract {
             +"," + PlanEntry.COLUMN_NAME_GOAL
             +"," + PlanEntry.COLUMN_NAME_MUSCLE_GROUP
             +"," + PlanEntry.COLUMN_NAME_RATING
-            + ") VALUES ('PushUpPlan', 2, 2, 5)," +
-            "('DipPlan', 2, 3, 5)" +
-            ",('UpperBody', 2, 3, 2)" +
-            ",('Plan', 2, 2, 2)" +
-            ",('PushUps', 2, 2, 4)" +
-            ",('Dips', 2, 3, 1)" +
+            + ") VALUES ('PushUpPlan', 2, 8, 5)," +
+            "('TricepsWorkout', 2, 1, 5)" +
+            ",('UpperBody', 1, 8, 2)" +
+            ",('PlanWholeEnd', 3, 2, 2)" +
+            ",('ArmMaxStrength', 1, 1, 4)" +
+            ",('BackWorkout', 2, 6, 1)" +
+            ",('PlanWholeStrength', 1, 7, 2)" +
             ";";
 
     public static final String SQL_INSERT_PLAN_EXERCISE_RELATION = "INSERT INTO "
-            + PlanExerciseRelationEntry.TABLE_NAME + "(" + PlanExerciseRelationEntry.COLUMN_NAME_EID
-            +"," + PlanExerciseRelationEntry.COLUMN_NAME_PID
+            + PlanExerciseRelationEntry.TABLE_NAME + "(" + PlanExerciseRelationEntry.COLUMN_NAME_PID
+            +"," + PlanExerciseRelationEntry.COLUMN_NAME_EID
             +"," + PlanExerciseRelationEntry.COLUMN_NAME_BREAK
             +"," + PlanExerciseRelationEntry.COLUMN_NAME_REPS
             +"," + PlanExerciseRelationEntry.COLUMN_NAME_SETS
             +"," + PlanExerciseRelationEntry.COLUMN_NAME_WEIGHT
-            +") VALUES (1, 1, 60, 10, 3, 0)" +
-            ",(2, 1, 60, 12, 2, 0)" +
-            ",(3, 1, 90, 10, 4, 0)" +
-            ",(3, 2, 180, 15, 4, 0)" +
-            ",(3, 3, 80, 12, 3, 0)" +
-            ",(2, 3, 80, 10, 4, 0)" +
-            ",(1, 4, 60, 12, 3, 0)" +
-            ",(2, 4, 40, 10, 4, 0)" +
-            ",(1, 5, 60, 15, 3, 0)" +
-            ",(3, 6, 40, 20, 4, 0)" +
+            +") VALUES (1, 1, 45, 15, 3, 0)" +
+            ",(1, 2, 60, 8, 2, 0)" +
+            ",(1, 4, 90, 10, 4, 0)" +
+            ",(1, 28, 90, 12, 3, 0)" +
+            ",(2, 3, 60, 15, 4, 0)" +
+            ",(2, 4, 60, 15, 4, 0)" +
+            ",(2, 26, 60, 10, 3, 5)" +
+            ",(3, 6, 180, 6, 3, 80)" +
+            ",(3, 17, 170, 5, 2, 70)" +
+            ",(3, 25, 170, 5, 2, 25)" +
+            ",(3, 5, 170, 5, 2, 35)" +
+            ",(4, 1, 20, 12, 3, 0)" +
+            ",(4, 3, 15, 12, 3, 0)" +
+            ",(4, 5, 15, 12, 3, 25)" +
+            ",(4, 20, 20, 10, 3, 35)" +
+            ",(4, 11, 15, 10, 3, 15)" +
+            ",(5, 28, 180, 15, 4, 0)" +
+            ",(5, 5, 180, 6, 2, 40)" +
+            ",(5, 27, 160, 5, 2, 30)" +
+            ",(6, 20, 50, 20, 4, 20)" +
+            ",(6, 21, 60, 15, 3, 30)" +
+            ",(6, 29, 60, 20, 4, 0)" +
+            ",(6, 30, 60, 20, 4, 0)" +
+            ",(7, 23, 180, 12, 4, 0)" +
+            ",(7, 6, 150, 6, 4, 55)" +
+            ",(7, 27, 160, 5, 3, 0)" +
+            ",(7, 20, 160, 5, 4, 50)" +
             ";";
 
     public static final String SQL_INSERT_PLAN_USER_RELATION = "INSERT INTO "
-            + UserPlanRelation.TABLE_NAME + "(" + UserPlanRelation.COLUMN_NAME_PID + "," + UserPlanRelation.COLUMN_NAME_UID
-            + ") VALUES (1,1),(2,1)" +
-            ",(3,2)" +
-            ",(4,3)" +
-            ",(5,4)" +
-            ",(6,5)" +
+            + UserPlanRelation.TABLE_NAME + "(" + UserPlanRelation.COLUMN_NAME_UID + "," + UserPlanRelation.COLUMN_NAME_PID
+            + ") VALUES (1,1),(1,2)" +
+            ",(2,3)" +
+            ",(3,4)" +
+            ",(4,5)" +
+            ",(5,6),(5,7)" +
             ";";
 }

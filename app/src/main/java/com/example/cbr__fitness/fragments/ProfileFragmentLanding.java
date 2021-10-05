@@ -5,10 +5,12 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.helper.widget.Flow;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,11 +18,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.cbr__fitness.R;
+import com.example.cbr__fitness.customViewElements.ColorChangeToggleButton;
 import com.example.cbr__fitness.data.User;
 import com.example.cbr__fitness.databasehelper.FitnessDBSqliteHelper;
 import com.example.cbr__fitness.enums.EquipmentEnum;
 import com.example.cbr__fitness.enums.LimitationEnum;
+import com.example.cbr__fitness.logic.AccountUtil;
 import com.example.cbr__fitness.logic.SharedPreferenceManager;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,6 +37,10 @@ import com.example.cbr__fitness.logic.SharedPreferenceManager;
  * create an instance of this fragment.
  */
 public class ProfileFragmentLanding extends Fragment {
+
+    List<ColorChangeToggleButton> equipmentButtons;
+
+    List<ColorChangeToggleButton> limitationButtons;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -81,7 +94,8 @@ public class ProfileFragmentLanding extends Fragment {
         FitnessDBSqliteHelper helper = new FitnessDBSqliteHelper(requireContext());
 
         User user = helper.getUserById(SharedPreferenceManager.getLoggedUserID(requireContext()));
-
+        DecimalFormat format = new DecimalFormat("#.##");
+        FloatingActionButton button = view.findViewById(R.id.floating_show_profile);
         ConstraintLayout constraint = view.findViewById(R.id.constraint_content_profile);
         TextView textName = view.findViewById(R.id.text_label_name_profile);
         TextView textWeight = view.findViewById(R.id.text_weight_profile);
@@ -98,25 +112,16 @@ public class ProfileFragmentLanding extends Fragment {
         textAge.setText(Integer.toString(user.getAgeN()));
         textGender.setText(user.getGenderN().name());
         textHeight.setText(Integer.toString(user.getHeight()));
-        textBMI.setText(Float.toString(user.getBMI()));
+        textBMI.setText(format.format(user.getBMI()));
         textWorkout.setText(user.getWorkoutTypeN().name());
+        equipmentButtons = new ArrayList<>();
+        AccountUtil.setUpToggleButtons(user,EquipmentEnum.values(), constraint, flowEquipment
+                , equipmentButtons,requireActivity(), false);
+        limitationButtons = new ArrayList<>();
+        AccountUtil.setUpToggleButtons(user, LimitationEnum.values(), constraint, flowLimitations
+                ,limitationButtons, requireActivity(), false);
 
-        for (LimitationEnum e : user.getLimitations()) {
-            TextView v = new TextView(requireContext());
-            v.setId(View.generateViewId());
-            v.setPadding(5,5,5,5);
-            v.setText(e.getLabel());
-            constraint.addView(v);
-            flowLimitations.addView(v);
-        }
-        for (EquipmentEnum e : user.getEquipments()) {
-            TextView v = new TextView(requireContext());
-            v.setText(e.getLabel());
-            v.setId(View.generateViewId());
-            v.setPadding(5,5,5,5);
-            v.setText(e.getLabel());
-            constraint.addView(v);
-            flowEquipment.addView(v);
-        }
+
+        button.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_profile_landing_fragment_to_edit_profile_fragment));
     }
 }

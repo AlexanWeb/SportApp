@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavInflater;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,21 +14,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.cbr__fitness.R;
-import com.example.cbr__fitness.adapters.ExchangeExercisesAdapter;
+import com.example.cbr__fitness.adapters.DeleteExerciseListAdapter;
 import com.example.cbr__fitness.customListenerMethods.ItemClickSupport;
-import com.example.cbr__fitness.logic.AccountUtil;
-import com.example.cbr__fitness.viewModels.ExerciseViewModel;
+import com.example.cbr__fitness.databasehelper.FitnessDBSqliteHelper;
+import com.example.cbr__fitness.viewModels.ExerciseListListViewModel;
+import com.example.cbr__fitness.viewModels.ExerciseListViewModel;
 import com.example.cbr__fitness.viewModels.PlanViewModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link EditExerciseList#newInstance} factory method to
+ * Use the {@link DeleteWorkouts#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class EditExerciseList extends Fragment {
+public class DeleteWorkouts extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -38,7 +40,7 @@ public class EditExerciseList extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public EditExerciseList() {
+    public DeleteWorkouts() {
         // Required empty public constructor
     }
 
@@ -48,11 +50,11 @@ public class EditExerciseList extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment EditExerciseList.
+     * @return A new instance of fragment delete_workouts.
      */
     // TODO: Rename and change types and number of parameters
-    public static EditExerciseList newInstance(String param1, String param2) {
-        EditExerciseList fragment = new EditExerciseList();
+    public static DeleteWorkouts newInstance(String param1, String param2) {
+        DeleteWorkouts fragment = new DeleteWorkouts();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -73,35 +75,36 @@ public class EditExerciseList extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_edit_exercise_list, container, false);
+        return inflater.inflate(R.layout.fragment_delete_workouts, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        FitnessDBSqliteHelper helper = new FitnessDBSqliteHelper(requireContext());
+        ExerciseListListViewModel model = new ViewModelProvider(requireActivity()).get(ExerciseListListViewModel.class);
+        PlanViewModel exerciseListViewModel = new ViewModelProvider(requireActivity()).get(PlanViewModel.class);
 
-        TextView durationTextView = view.findViewById(R.id.text_duration_edit_exercise_list);
-        TextView goalShowExercise = view.findViewById(R.id.text_goal_edit_exercise_list);
-        TextView muscleShowExercise = view.findViewById(R.id.text_muscle_group_edit_exercises_list);
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_edit_exercises_list);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_delete_workouts);
 
-        ExerciseViewModel modelExercise = new ViewModelProvider(getActivity()).get(ExerciseViewModel.class);
+        FloatingActionButton button = view.findViewById(R.id.floating_edit_button_delete_workouts);
 
-        PlanViewModel model = new ViewModelProvider(requireActivity()).get(PlanViewModel.class);
         model.getSelected().observe(getViewLifecycleOwner(), list -> {
-            durationTextView.setText((AccountUtil.getDurationAsTime(list.getDuration())));
-            goalShowExercise.setText(list.getGoal().getLabel());
-            muscleShowExercise.setText(list.getMuscle_group().getLabel());
-            ExchangeExercisesAdapter adapter = new ExchangeExercisesAdapter(list.getExercises(), requireActivity());
+            DeleteExerciseListAdapter adapter = new DeleteExerciseListAdapter(list, requireContext());
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
+            button.setOnClickListener(v -> {
+                System.out.println("NUMBER: " + adapter.getChosenPlans().size());
+                helper.deletePlans(adapter.getChosenPlans());
+                Navigation.findNavController(v).navigate(R.id.action_fragment_delete_workouts_to_fragment_workout_landing);
+            });
 
-            ItemClickSupport.addTo(recyclerView).setOnItemClickListener((recyclerView1, position, v) -> {
-                modelExercise.addExercise(list.getExercises().get(position));
+            ItemClickSupport.addTo(recyclerView).setOnItemClickListener((recycler, position, v) -> {
+                exerciseListViewModel.addPlanList(list.get(position));
                 Bundle bundle = new Bundle();
-                bundle.putString("title",list.getExercises().get(position).getName());
-                bundle.putBoolean("result", true);
-                Navigation.findNavController(v).navigate(R.id.action_fragment_edit_exercise_list_to_fragment_show_exercise, bundle);
+                bundle.putString("title",list.get(position).getPlan_name());
+                bundle.putBoolean("result", false);
+                Navigation.findNavController(v).navigate(R.id.action_fragment_delete_workouts_to_fragment_show_exercise_list, bundle);
             });
         });
     }

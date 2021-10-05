@@ -21,15 +21,20 @@ import com.example.cbr__fitness.cbr.RetrievalUtil;
 import com.example.cbr__fitness.customListenerMethods.ColorChangeToggleListener;
 import com.example.cbr__fitness.customViewElements.ColorChangeToggleButton;
 import com.example.cbr__fitness.data.Exercise;
+import com.example.cbr__fitness.data.ExerciseList;
+import com.example.cbr__fitness.data.Plan;
 import com.example.cbr__fitness.data.User;
 import com.example.cbr__fitness.databasehelper.FitnessDBSqliteHelper;
 import com.example.cbr__fitness.enums.EquipmentEnum;
 import com.example.cbr__fitness.logic.SharedPreferenceManager;
+import com.example.cbr__fitness.viewModels.ExerciseListViewModel;
 import com.example.cbr__fitness.viewModels.ExerciseViewModel;
 import com.example.cbr__fitness.viewModels.PlanViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.dfki.mycbr.util.Pair;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -94,11 +99,17 @@ public class ExchangeExercise extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         RetrievalUtil util = new RetrievalUtil(this.getActivity().getFilesDir().getAbsolutePath() + "/");
         helper = new FitnessDBSqliteHelper(requireContext());
         int id = SharedPreferenceManager.getLoggedUserID(requireContext());
         User user = helper.getUserById(id);
+
         List<EquipmentEnum> equipments = new ArrayList<>();
+
+        ExerciseList exerciseList = new ViewModelProvider(requireActivity()).get(PlanViewModel.class).getSelected().getValue();
+
+
         model = new ViewModelProvider(requireActivity()).get(ExerciseViewModel.class);
 
         Flow flowLayout = view.findViewById(R.id.flow_choose_equipment_exchange_exercise);
@@ -121,8 +132,15 @@ public class ExchangeExercise extends Fragment {
                     equipments.add((EquipmentEnum) c.getEnumE());
                 }
             }
-            util.retrieveExercise(helper, model.getSelected().getValue() , equipments);
-
+            List<Pair<Exercise, Double>> retrievedExercises = util.retrieveExercise(helper
+                    , model.getSelected().getValue() , equipments, exerciseList.getAllExerciseIDs());
+            for (Pair<Exercise, Double> p : retrievedExercises) {
+                if (p.getFirst() != null) {
+                    System.out.println("Exercise: " + p.getFirst().getName() + " SIM : " + p.getSecond() ) ;
+                }
+            }
+            ExerciseListViewModel viewModel = new ViewModelProvider(requireActivity()).get(ExerciseListViewModel.class);
+            viewModel.addExercise(retrievedExercises);
             Navigation.findNavController(view).navigate(R.id.action_fragment_exchange_exercise_to_fragment_exchange_exercise_cbr_result);
         });
     }

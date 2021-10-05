@@ -125,10 +125,10 @@ public class EditExercise extends Fragment {
 
             actionButton.setOnClickListener(v -> {
                 Bundle bundle = new Bundle();
-                int newSet = Integer.parseInt(setEditText.getText().toString());
-                int newRep = Integer.parseInt(repEditText.getText().toString());
-                int newBreak = Integer.parseInt(breakEditText.getText().toString());
-                int newWeight = Integer.parseInt(weightEditText.getText().toString());
+                int newSet = !setEditText.getText().toString().isEmpty() ? Integer.parseInt(setEditText.getText().toString()) : oldSet;
+                int newRep = !repEditText.getText().toString().isEmpty() ? Integer.parseInt(repEditText.getText().toString()) : oldRep;
+                int newBreak = !breakEditText.getText().toString().isEmpty() ? Integer.parseInt(breakEditText.getText().toString()) : oldBreak;
+                int newWeight = !weightEditText.getText().toString().isEmpty() ? Integer.parseInt(weightEditText.getText().toString()): oldWeight;
 
                 if ((oldSet != newSet) || (oldRep != newRep) || (oldBreak != newBreak) || (newWeight != oldWeight)) {
                     helper.updateExerciseData(exercise.getExerciseID(), exercise.getPlanID(), newSet, newRep, newWeight, newBreak);
