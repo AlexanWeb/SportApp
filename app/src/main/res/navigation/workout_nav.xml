@@ -156,5 +156,4 @@
         tools:layout="@layout/fragment_create_exercise">
 
     </fragment>
-
 </navigation>

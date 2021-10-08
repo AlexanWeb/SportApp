@@ -18,8 +18,6 @@ import de.dfki.mycbr.core.similarity.config.AmalgamationConfig;
 
 public class CBRConstants {
 
-    public static final double WEIGHT_LIMITATION = 1;
-
     public static final double MATCHING_MUSCLE_GROUPS = 1.0;
 
     public static final double LEG_OTHER_MUSCLE_GROUP = 0.0;
@@ -38,6 +36,8 @@ public class CBRConstants {
     public static final double WEIGHT_DURATION = 1;
 
     public static final double WEIGHT_AGE = 1;
+
+    public static final double WEIGHT_LIMITATION = 1;
 
     public static final double WEIGHT_TRAINING_TYPE = 1;
 
