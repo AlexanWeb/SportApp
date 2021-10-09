@@ -191,11 +191,11 @@ public class Exercise implements ToCaseCsvInterface {
     public MovementTypeEnum getMovementType() {
         return movementType;
     }
-    // "exerciseID;primary_muscle;secondary_muscle;exercise_type;equipment;movement_type\n"
+    // "exerciseID;primary_muscle;secondary_muscle;exercise_type;equipment;movement_type;is_explosive;is_bodyweight\n"
     public String toCsvCase() {
         return  exerciseID + ";" + muscle.getSymbol() + ";" + secondaryMuscle.getSymbol()
                 + ";" + type.getSymbol() + ";" + equipment.getSymbol() + ";" + movementType.getLabel()
-                + ";" + isExplosive
+                + ";" + isExplosive + ";" + isBodyweight
                 + "\n";
     }
 

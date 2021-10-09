@@ -34,36 +34,38 @@ public class CBRConstants {
     public static final double MAX_DURATION_DIFFERENCE = 900.0;
 
     public static final double WEIGHT_DURATION = 1;
-
+    //-------------------------- WEIGHTS PERSON CBR------------------------------------
     public static final double WEIGHT_AGE = 1;
 
-    public static final double WEIGHT_LIMITATION = 1;
+    public static final double WEIGHT_LIMITATION = 10;
 
-    public static final double WEIGHT_TRAINING_TYPE = 1;
+    public static final double WEIGHT_TRAINING_TYPE = 6;
 
-    public static final double WEIGHT_BMI = 1;
+    public static final double WEIGHT_BMI = 3;
 
-    public static final double WEIGHT_GENDER = 1;
+    public static final double WEIGHT_GENDER = 4;
 
-    public static final double WEIGHT_HEIGHT = 1;
+    public static final double WEIGHT_HEIGHT = 2;
 
-    public static final double WEIGHT_WEIGHT = 1;
-
+    public static final double WEIGHT_WEIGHT = 2;
+    //-------------------------- WEIGHTS PERSON END--------------------------------
     public static final double WEIGHT_GOAL = 1;
 
-    public static final double WEIGHT_EQUIPMENT = 3;
+    public static final double WEIGHT_EQUIPMENT_PLAN = 1;
+    //-------------------------- EQ WEIGHTS-------------------------
+    public static final double WEIGHT_EXERCISE_TYPE = 8; //Multi /Single joint
 
-    public static final double WEIGHT_EXERCISE_TYPE = 3;
+    public static final double WEIGHT_IS_EXPLOSIVE = 7;
 
-    public static final double WEIGHT_IS_EXPLOSIVE = 2;
+    public static final double WEIGHT_MOVEMENT_TYPE = 4; // Push pull isometisch
 
-    public static final double WEIGHT_MOVEMENT_TYPE = 2;
-
-    public static final double WEIGHT_PRIMARY_MUSCLE = 2;
+    public static final double WEIGHT_PRIMARY_MUSCLE = 7;
 
     public static final double WEIGHT_SECONDARY_MUSCLE = 2;
 
-    public static final double WEIGHT_EQUIPMENT_PLAN = 1;
+    public static final double WEIGHT_IS_BODYWEIGHT = 8;
+
+    public static final double WEIGHT_EQUIPMENT = 5;
 
     public static final double USER_SIMILARITY_THRESHOLD = 0.3;
 

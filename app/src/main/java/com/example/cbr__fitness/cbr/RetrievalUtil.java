@@ -110,6 +110,8 @@ public class RetrievalUtil {
         myConceptExercise.getActiveAmalgamFct().setWeight(primaryMuscle, CBRConstants.WEIGHT_PRIMARY_MUSCLE);
         SymbolDesc secondaryMuscle = (SymbolDesc) myConceptExercise.getAllAttributeDescs().get("secondary_muscle");
         myConceptExercise.getActiveAmalgamFct().setWeight(secondaryMuscle, CBRConstants.WEIGHT_SECONDARY_MUSCLE);
+        BooleanDesc isBodyweight = (BooleanDesc) myConceptExercise.getAllAttributeDescs().get("is_bodyweight");
+        myConceptExercise.getActiveAmalgamFct().setWeight(isBodyweight, CBRConstants.WEIGHT_IS_BODYWEIGHT);
 
         try {
             LinkedList<Attribute> attributes = new LinkedList<>();
@@ -124,6 +126,7 @@ public class RetrievalUtil {
             query.addAttribute(movementType, exercise.getMovementType().getLabel());
             query.addAttribute(primaryMuscle, exercise.getMuscle().getSymbol());
             query.addAttribute(secondaryMuscle, exercise.getSecondaryMuscle().getSymbol());
+            query.addAttribute(isBodyweight, exercise.isBodyweight());
         } catch (ParseException exe) {
             System.out.println("Parse Excep: " + exe);
         }

@@ -401,8 +401,8 @@ public class FitnessDBContract {
             ",('Barebell Shrug ', 3, 1, 8, 'Gerade stehen, Schultern heben.', 11, 14, 'LINK', 2, 0,0)" + //15
             ",('Machine Chest Press', 4, 1, 2, 'Machine arme nach Vorne drücken.', 4, 2, 'LINK', 2, 0,0)" +
             ",('Machine Chest Fly ', 3, 1, 2, 'Maschine Arm frontal zusammenführen.', 4, 6, 'LINK', 1, 0,0)" +
-            ",('Lying Chest Fly ', 3, 1, 3, 'Auf Rücken Hanteln oben zusammenführen.', 4, 6, 'LINK', 2, 0,0)" +
-            ",('Dumbell Bench Press ', 3, 1, 3, 'Gerade stehen, Schultern heben.', 4, 6, 'LINK', 2, 0,0)" +
+            ",('Lying Chest Fly ', 3, 1, 3, 'Auf Rücken Hanteln oben zusammenführen.', 4, 6, 'LINK', 1, 0,0)" +
+            ",('Dumbell Bench Press ', 3, 1, 3, 'Gerade stehen, Schultern heben.', 4, 6, 'LINK', 1, 0,0)" +
             ",('Machine Seateted Row ', 4, 2, 2, 'Gerade stehen, Schultern heben.', 15, 11, 'LINK', 2, 0,0)" + //20
             ",('Lat-Pulldown ', 4, 2, 2, 'Stange von oben herrunter ziehen.', 15, 1, 'LINK', 2, 0,0)" +
             ",('Asissted Pull-Up', 5, 2, 2, 'Asisstet Pullup Machine nutzen.', 15, 1, 'LINK', 2, 0, 1)" +

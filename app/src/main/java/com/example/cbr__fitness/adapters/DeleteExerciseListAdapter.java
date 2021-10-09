@@ -115,7 +115,7 @@ public class DeleteExerciseListAdapter extends RecyclerView.Adapter<DeleteExerci
             button = itemView.findViewById(R.id.color_change_toggle_delete_exercise_list_recycler_item);
             button.setOnClickListener(v -> {
                 if (chosenPlans.contains(getAdapterPosition())) {
-                    chosenPlans.remove(getAdapterPosition());
+                    chosenPlans.remove(Integer.valueOf(getAdapterPosition()));
                 } else {
                     chosenPlans.add(getAdapterPosition());
                 }
