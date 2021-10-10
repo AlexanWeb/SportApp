@@ -287,6 +287,7 @@ public class CbrResult extends Fragment {
             List<Exercise> exercises = getSimilarExercisesForAdaption(e, bundle);
             adaptExerciseAfter(exercises, e);
         }
+        exerciseList.setGoal(bundle.getInt("goal"));
     }
 
     private List<Exercise> getSimilarExercisesForAdaption(Exercise exchange, Bundle bundle ) {

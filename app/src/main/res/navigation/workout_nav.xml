@@ -155,5 +155,8 @@
         android:label="Erstellen"
         tools:layout="@layout/fragment_create_exercise">
 
+        <action
+            android:id="@+id/action_fragment_create_exercises_to_fragment_show_exercise"
+            app:destination="@id/fragment_show_exercise" />
     </fragment>
 </navigation>

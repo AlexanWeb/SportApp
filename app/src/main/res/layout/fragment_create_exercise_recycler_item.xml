@@ -11,7 +11,7 @@
         android:background="@color/darkGrayRecycler"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toStartOf="@id/button_add_create_exercise">
 
         <TextView
             android:layout_width="wrap_content"
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/constraint_content_create_recycler_item"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/button_add_create_exercise"
         app:layout_constraintTop_toBottomOf="@id/constraint_header_create_recycler_item">
 
         <TextView
@@ -74,5 +74,15 @@
             app:layout_constraintTop_toTopOf="@id/text_label_secondary_muscle_create_recycler_item"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:id="@+id/button_add_create_exercise"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

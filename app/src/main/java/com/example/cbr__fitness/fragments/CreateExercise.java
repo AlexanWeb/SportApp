@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.helper.widget.Flow;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,6 +30,7 @@ import com.example.cbr__fitness.enums.MuscleGroupEnum;
 import com.example.cbr__fitness.interfaces.EnumInterface;
 import com.example.cbr__fitness.logic.AccountUtil;
 import com.example.cbr__fitness.logic.SharedPreferenceManager;
+import com.example.cbr__fitness.viewModels.ExerciseViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +46,19 @@ public class CreateExercise extends Fragment {
 
     Flow flow;
 
+    List<Exercise> allExercises;
+
+    List<Exercise> selectedExercises;
+
+    CreateExerciseAdapter adapter;
+
+    CreateExerciseAdapter selectedAdapter;
+
     public CreateExercise() {
         // Required empty public constructor
         muscleGroupList = new ArrayList<>();
+        allExercises = new ArrayList<>();
+        selectedExercises = new ArrayList<>();
     }
 
 
@@ -68,21 +80,41 @@ public class CreateExercise extends Fragment {
 
         FitnessDBSqliteHelper helper = new FitnessDBSqliteHelper(requireContext());
         User user = helper.getUserById(SharedPreferenceManager.getLoggedUserID(getActivity().getApplicationContext()));
-        List<Exercise> allExercises = helper.getAllPossibleExercisesForUser(1, user.getEquipments());
+        allExercises = helper.getAllPossibleExercisesForUser(1, user.getEquipments());
+
+        ExerciseViewModel modelExercise = new ViewModelProvider(requireActivity()).get(ExerciseViewModel.class);
 
         constraintLayout = view.findViewById(R.id.constraint_create_exercise_constraint);
         flow = view.findViewById(R.id.flow_create_exercise_muscle_group);
-        RecyclerView recyclerViewPossible = view.findViewById(R.id.recycler_create_offered_exercises);
 
-        CreateExerciseAdapter adapter = new CreateExerciseAdapter(allExercises);
+        RecyclerView recyclerViewPossible = view.findViewById(R.id.recycler_create_offered_exercises);
+        RecyclerView recyclerViewSelected = view.findViewById(R.id.recycler_create_chosen_exercises);
+
+        adapter = new CreateExerciseAdapter(allExercises, this, false);
+        selectedAdapter = new CreateExerciseAdapter(selectedExercises, this, true);
+
         recyclerViewPossible.setAdapter(adapter);
         recyclerViewPossible.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
 
+        recyclerViewSelected.setAdapter(selectedAdapter);
+        recyclerViewSelected.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
+
         ItemClickSupport.addTo(recyclerViewPossible).setOnItemClickListener((recycler, position, v) -> {
+            modelExercise.addExercise(allExercises.get(position));
+            Bundle bundle = new Bundle();
+            bundle.putString("title",allExercises.get(position).getName());
+            bundle.putBoolean("result", true);
+            Navigation.findNavController(v).navigate(R.id.action_fragment_create_exercises_to_fragment_show_exercise, bundle);
 
         });
 
-        RecyclerView recyclerViewChosen = view.findViewById(R.id.recycler_create_chosen_exercises);
+        ItemClickSupport.addTo(recyclerViewSelected).setOnItemClickListener((recycler, position, v) -> {
+            modelExercise.addExercise(selectedExercises.get(position));
+            Bundle bundle = new Bundle();
+            bundle.putString("title",selectedExercises.get(position).getName());
+            bundle.putBoolean("result", true);
+            Navigation.findNavController(v).navigate(R.id.action_fragment_create_exercises_to_fragment_show_exercise, bundle);
+        });
 
         muscleGroupList = new ArrayList<>();
         createSwitchButtonsFromEnums(MuscleGroupEnum.values());
@@ -104,5 +136,25 @@ public class CreateExercise extends Fragment {
 
             flow.addView(t);
         }
+    }
+
+    public void gotNotified (Exercise e, int position) {
+        if (selectedExercises.contains(e)) {
+            System.out.println("SELECTED");
+            if (position < selectedExercises.size() && position >= 0) {
+                selectedExercises.remove(e);
+                allExercises.add(e);
+                selectedAdapter.notifyItemRemoved(position);
+                adapter.notifyItemInserted(adapter.getItemCount() == 0 ? 0 : adapter.getItemCount());
+            }
+        } else {
+            if (position < allExercises.size() && position >= 0) {
+                allExercises.remove(e);
+                selectedExercises.add(e);
+                adapter.notifyItemRemoved(position);
+                selectedAdapter.notifyItemInserted(selectedAdapter.getItemCount() == 0 ? 0 : selectedAdapter.getItemCount());
+            }
+        }
+        System.out.println("got notified" + e.getName());
     }
 }

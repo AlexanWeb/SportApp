@@ -70,7 +70,6 @@ public class DeleteExerciseListAdapter extends RecyclerView.Adapter<DeleteExerci
             holder.constraintMainBody.addView(t);
             holder.flowEquipmentList.addView(t);
         }
-
         holder.itemView.setOnClickListener(v -> System.out.println("HIT: " + v.getId()));
     }
 
@@ -120,7 +119,6 @@ public class DeleteExerciseListAdapter extends RecyclerView.Adapter<DeleteExerci
                     chosenPlans.add(getAdapterPosition());
                 }
             });
-
         }
     }
 }
