@@ -265,7 +265,8 @@ public class FitnessDBContract {
 
     public static final String SQL_INSERT_LIMITATIONS= "INSERT INTO "
             + LimitationsEntry.TABLE_NAME + " (" + LimitationsEntry.COLUMN_NAME_LIMITATION + ") " +
-            "VALUES ('Elbows'), ('Wrists'), ('Shoulder'), ('Knees'), ('Spine'), ('Hüften');";
+            "VALUES ('Elbows'), ('Wrists'), ('Shoulder'), ('Knees'), ('Spine'), ('Hüften')" +
+            ", ('Herzschrittmacher'), ('Diabetis');";
 
     public static final String SQL_INSERT_ROLLS ="INSERT INTO "
             + RollEntry.TABLE_NAME + " (" + RollEntry.COLUMN_NAME_ROLL + ") " +
@@ -311,6 +312,10 @@ public class FitnessDBContract {
             ",('Tre', 'Tre', 25, 1, 3, 72, 181)" +  //30
             ",('Sche', 'Sche', 25, 1, 1, 102, 181)" +
             ",('Kra', 'Kra', 25, 1, 1, 72, 210)" +
+            ",('Ove', 'Ove', 26, 1, 1, 160, 181)" +
+            ",('Mart', 'Mart', 23, 1, 1, 187, 175)" +
+            ",('Otr', 'Otr', 19, 2, 1, 143, 161)" + //35
+            ",('Lia', 'Lia', 23, 2, 1, 168, 155)" +
             ";";
 
     public static final String SQL_INSERT_USER_ROLL = "INSERT INTO "
@@ -347,14 +352,18 @@ public class FitnessDBContract {
             ", (30, 1)" +
             ", (31, 1)" +
             ", (32, 1)" +
+            ", (33, 1)" +
+            ", (34, 1)" +
+            ", (35, 1)" +
+            ", (36, 1)" +
             ";";
 
     public static final String SQL_INSERT_USER_LIMITATION_REL = "INSERT INTO "
             + LimitationsUserRelation.TABLE_NAME + "(" + LimitationsUserRelation.COLUMN_NAME_UID
             + ", " + LimitationsUserRelation.COLUMN_NAME_LID + ") " +
             "VALUES (1, 3),(4, 2), (4, 4), (5, 5), (5, 4), (6,4), (8,2), (8, 3), (12,5), (13, 3)" +
-            ",(18, 1), (18,2), (23, 1), (26, 3), (28, 3), (28, 1);";
-
+            ",(18, 1), (18,2), (23, 1), (26, 3), (28, 3), (28, 1), (33, 4), (35, 4);";
+    //The line breaks are used to enable scrolling int the text fields as to not hide text behind the editing buttons.
     public static final String SQL_INSERT_EXERCISES = "INSERT INTO "
             + ExerciseEntry.TABLE_NAME + "(" + ExerciseEntry.COLUMN_NAME_TITLE
             +"," + ExerciseEntry.COLUMN_NAME_DURATION_REP
@@ -370,64 +379,73 @@ public class FitnessDBContract {
             + ") VALUES ('Push-Up', 3, 2, 1, 'Begeben sie sich in eine liegende Position mit dem " +
             "Gesicht nach unten, platzieren sie ihre Arme schulterbreit unter den Schultern und" +
             " ihre Fuesse huefstbreit. Spannen sie ihre Bauchmuseln und ihre Glutes an. Druecken sie" +
-            "sich mit ihren Armen nach oben und lassen sich dann wieder Runter. Achten sie auf einen" +
-            "geraden Ruecken.', 4, 6, 'LINK', 1, 0, 1)" +
+            "sich mit ihren Armen nach oben und lassen sich dann wieder Runter.\n1. Die Arme durchdrücken \n" +
+            "2. Die Hände nach vorne \n3. Den Bauch angespannt lassen \n4. Hüfte leicht nach vorne \n5. Füße auf die Zehenspitzen" +
+            " Achten sie auf einen geraden Ruecken.\n\n\n\n', 4, 6, 'mens_healt_push_up', 1, 0, 1)" +
             ",('Clapping Push-Up', 3, 2, 1, 'Begeben sie sich in eine liegende Position mit dem " +
             "Gesicht nach unten, platzieren sie ihre Arme schulterbreit unter den Schultern und" +
             " ihre Fuesse huefstbreit. Spannen sie ihre Bauchmuseln und ihre Glutes an. Druecken sie" +
             "sich schnell nach oben, so dass sie bevor sie wieder absinken in die Haende klatschen" +
             " koennen. Nach dem klatschen die Arme wieder in die Ausgangspositions um den abstieg " +
-            "abzufangen. Achten sie auf einen geraden Ruecken.', 4, 6, 'LINK', 1, 1, 1)" +
+            "abzufangen. Achten sie auf einen geraden Ruecken.', 4, 6, 'usersetts', 1, 1, 1)" +
             ",('Dip', 5, 2, 9, 'Beidseitig die Stangen greifen, eine gerade Haltung einnehmen, dann" +
             "den Koerper langsam und kontrolliert durch das Biegen der Arme senken und anschliessend" +
-            "wieder hochdruecken', 2, 4, 'LINK', 1, 0, 1)" +
+            "wieder hochdruecken', 2, 4, 'usersetts', 1, 0, 1)" +
             ",('Bench Dip', 5, 2, 10, 'Platzieren sie sich mit dem Rücken zu einer Bank, setzen " +
             "sie sich davor, platzieren ihre Hände mit den Fingern nach vorne und drücken sich" +
-            "nur mit den Armen hoch.', 2, 4, 'LINK', 1, 0, 1)" +
+            "nur mit den Armen hoch.', 2, 4, 'usersetts', 1, 0, 1)" +
             ",('Biceps Curls', 3, 1, 3, 'Stehen sie gerade, nehmen sie eine Handel, halten sie den " + //5
             "Arm mit der Hanel an ihrer Seite, die Daumen nach außen, heben sie die Handel bis " +
-            "zum höchsten Punk und senken sie die Hantel wiede.', 1, 14, 'LINK', 2, 0, 0)" +
+            "zum höchsten Punk und senken sie die Hantel wiede.', 1, 14, 'usersetts', 2, 0, 0)" +
             ",('Bench Press', 6, 2, 7, 'Stehen sie gerade, nehmen sie eine Handel, halten sie den " +
             "Arm mit der Hanel an ihrer Seite, die Daumen nach außen, heben sie die Handel bis " +
-            "zum höchsten Punk und senken sie die Hantel wiede.', 4, 6, 'LINK', 1, 0, 0)" +
+            "zum höchsten Punk und senken sie die Hantel wiede.', 4, 6, 'usersetts', 1, 0, 0)" +
             ",('Archer Push-Up', 4, 2, 1, 'ArcherPushUp.', 4, 6, 'LINK', 1, 0, 1)" +
-            ",('Cable Lateral-Raise', 5, 1, 2, 'Stehen seitlich ziehen.', 6, 14, 'LINK', 2, 0, 0)"+
-            ",('Dumbell Lateral Raise', 3, 2, 3, 'Seitlich hanteln heben.', 6, 11, 'LINK', 2, 0, 0)" +
-            ",('Dumbell Front Raise', 3, 2, 3, 'Frontal hanteln heben.', 6, 11, 'LINK', 2, 0, 0)" +  //10
-            ",('Bent-Over Dumbell Fly', 4, 2, 3, 'Vorbeugen hanteln seitlich heben.', 6, 11, 'LINK', 2, 0, 0)" +
-            ",('Upright Dumbell Raise', 3, 2, 3, 'Frontal hanteln heben. Ellbogen außen.', 6, 11, 'LINK', 2, 0,0)" +
-            ",('Machine Shoulder Press', 4, 2, 2, 'Machine Schulter Vordruecken.', 6, 2, 'LINK', 1, 0,0)" +
+            ",('Cable Lateral-Raise', 5, 1, 2, 'Stehen seitlich ziehen.', 6, 14, 'usersetts', 2, 0, 0)"+
+            ",('Dumbbell Lateral Raise', 3, 2, 3, 'Seitlich hanteln heben.', 6, 11, 'usersetts', 2, 0, 0)" +
+            ",('Dumbbell Front Raise', 3, 2, 3, 'Frontal hanteln heben.', 6, 11, 'usersetts', 2, 0, 0)" +  //10
+            ",('Bent-Over Dumbbell Fly', 4, 2, 3, 'Vorbeugen hanteln seitlich heben.', 6, 11, 'usersetts', 2, 0, 0)" +
+            ",('Upright Dumbbell Raise', 3, 2, 3, 'Frontal hanteln heben. Ellbogen außen.', 6, 11, 'usersetts', 2, 0,0)" +
+            ",('Machine Shoulder Press', 4, 2, 2, 'Machine Schulter Vordruecken.', 6, 2, 'usersetts', 1, 0,0)" +
             ",('Steated Barebell Military Press', 3, 2, 8, 'Hantel ueber Kopf druecken.', 6, 1, 'LINK', 1, 0,0)" +
-            ",('Barebell Shrug ', 3, 1, 8, 'Gerade stehen, Schultern heben.', 11, 14, 'LINK', 2, 0,0)" + //15
-            ",('Machine Chest Press', 4, 1, 2, 'Machine arme nach Vorne drücken.', 4, 2, 'LINK', 2, 0,0)" +
-            ",('Machine Chest Fly ', 3, 1, 2, 'Maschine Arm frontal zusammenführen.', 4, 6, 'LINK', 1, 0,0)" +
-            ",('Lying Chest Fly ', 3, 1, 3, 'Auf Rücken Hanteln oben zusammenführen.', 4, 6, 'LINK', 1, 0,0)" +
-            ",('Dumbell Bench Press ', 3, 1, 3, 'Gerade stehen, Schultern heben.', 4, 6, 'LINK', 1, 0,0)" +
-            ",('Machine Seateted Row ', 4, 2, 2, 'Gerade stehen, Schultern heben.', 15, 11, 'LINK', 2, 0,0)" + //20
-            ",('Lat-Pulldown ', 4, 2, 2, 'Stange von oben herrunter ziehen.', 15, 1, 'LINK', 2, 0,0)" +
-            ",('Asissted Pull-Up', 5, 2, 2, 'Asisstet Pullup Machine nutzen.', 15, 1, 'LINK', 2, 0, 1)" +
-            ",('Pull Up', 4, 2, 6, 'Pull Up', 15, 1, 'LINK', 2, 0, 1)" +
-            ",('Dumbell single arm Row', 2, 2, 3, 'Vorbeugen, arm seitlich geradte hochiehen.', 15, 1, 'LINK', 2, 0 ,1)" +
-            ",('Machine Seated Triceps Push-Down', 3, 2, 2, 'user Machine', 2, 14, 'LINK', 1, 0, 0)" +  //25
-            ",('Cable Triceps Extension', 3, 2, 2, 'user Machine', 2, 14, 'LINK', 1, 0, 0)" +
-            ",('Dumbell Hammer Curl', 2, 2, 3, 'user Machine', 1, 3, 'LINK', 1, 0, 0)" + //Strength training page 205
-            ",('Diamond Push Up', 2, 2, 1, 'Diamond Push Up', 2, 4, 'LINK', 1, 0, 1)" +
-            ",('Pull Up Superman', 3, 2, 1, 'Auf bauch legen, Oberkörper anheben, Pull Up movement', 11, 12, 'LINK', 2, 0, 1)" +
-            ",('Back Crunch', 2, 1, 1, 'Auf bauch legen, Oberkörper und beine hochziehehn', 12, 15, 'LINK', 2, 0, 1)" +   //30
-            ",('Rotational Plank', 3, 2, 1, 'Plank, dann einen Arm Zur decke Körper drehen', 5, 6, 'LINK', 2, 0, 1)" +
-            ",('Triceps Extension', 2, 2, 1, 'Plank mit Armen auf Tisch, nur druch Triceps hochdrücken', 2, 5, 'LINK', 1, 0, 1)" +
-            ",('Short-Lever Inverted Curl', 2, 2, 1, 'Unter Tisch mit Armen hochziehen', 1, 6, 'LINK', 2, 0, 1)" +
-            ",('Biceps Chin Up', 4, 2, 6, 'Hände so an Stange, dass Per Bizeps gezogen wird', 1, 15, 'LINK', 2, 0, 1)" +
-            ",('Three Point Bench Dip', 3, 2, 1, 'Stühle so dass Arme auf einem und Füße auf dem anderen', 2, 6, 'LINK', 1, 0, 1)" +  //35
-            ",('Push Back', 3, 2, 1, 'Vorbäugen, mit Glutes in der Höhe, nach vorne mit dem Gesicht zum Boden, wegrdücken', 6, 11, 'LINK', 1, 0, 1)" +
-            ",('Peak Push Up', 3, 2, 1, 'Füße auf Stuhl, Glutes höchstr  Punkt rücken Gerade, push up Bewegung', 6, 2, 'LINK', 1, 0, 1)" +
-            ",('Crunch', 2, 2, 1, 'Auf Boden, nur durch Bauch Oberkörper hochheben', 5, 14, 'LINK', 2, 0, 1)" +
-            ",('Side Crunch', 2, 2, 1, 'Auf dem Rücken Beine Angewinklent nach links und rechts absenken', 5, 14, 'LINK', 1, 0, 1)" +
-            ",('Back Crunch', 2, 2, 1, 'Reverse Crunch auf dem Bauch liegend', 15, 10, 'LINK', 2, 0, 1)" +  //40
-            ",('Side Plank', 1, 2, 1, 'Seitliche Plan, Hüften senken und Anheben', 5, 14, 'LINK', 2, 0, 1)" +
-            ",('Sumo Squad', 3, 2, 1, 'Squad, Knie nach ausßen.', 9, 10, 'LINK', 1, 0, 1)" +
-            ",('Squad', 3, 2, 1, 'Squad.', 9, 10, 'LINK', 1, 0, 1)" +
-            ",('Pistol Squat', 4, 2, 1, 'Einbeiniger Squad bis zum Boden, Arme ausgestreckt', 9, 8, 'LINK', 1, 0, 1)" +
+            ",('Barebell Shrug ', 3, 1, 8, 'Gerade stehen, Schultern heben.', 11, 14, 'usersetts', 2, 0,0)" + //15
+            ",('Machine Chest Press', 4, 1, 2, 'Machine arme nach Vorne drücken.', 4, 2, 'usersetts', 2, 0,0)" +
+            ",('Machine Chest Fly ', 3, 1, 2, 'Maschine Arm frontal zusammenführen.', 4, 6, 'usersetts', 1, 0,0)" +
+            ",('Lying Chest Fly ', 3, 1, 3, 'Auf Rücken Hanteln oben zusammenführen.', 4, 6, 'usersetts', 1, 0,0)" +
+            ",('Dumbbell Bench Press ', 3, 1, 3, 'Gerade stehen, Schultern heben.', 4, 6, 'usersetts', 1, 0,0)" +
+            ",('Machine Seateted Row ', 4, 2, 2, 'Gerade stehen, Schultern heben.', 15, 11, 'usersetts', 2, 0,0)" + //20
+            ",('Lat-Pulldown ', 4, 2, 2, 'Stange von oben herrunter ziehen.', 15, 1, 'usersetts', 2, 0,0)" +
+            ",('Asissted Pull-Up', 5, 2, 2, 'Asisstet Pullup Machine nutzen.', 15, 1, 'usersetts', 2, 0, 1)" +
+            ",('Pull Up', 4, 2, 6, 'Pull Up', 15, 1, 'usersetts', 2, 0, 1)" +
+            ",('Dumbbell single arm Row', 2, 2, 3, 'Vorbeugen, arm seitlich geradte hochiehen.', 15, 1, 'usersetts', 2, 0 ,1)" +
+            ",('Machine Seated Triceps Push-Down', 3, 2, 2, 'user Machine', 2, 14, 'usersetts', 1, 0, 0)" +  //25
+            ",('Cable Triceps Extension', 3, 2, 2, 'user Machine', 2, 14, 'usersetts', 1, 0, 0)" +
+            ",('Dumbbell Hammer Curl', 2, 2, 3, 'user Machine', 1, 3, 'usersetts', 2, 0, 0)" + //Strength training page 205
+            ",('Diamond Push Up', 2, 2, 1, 'Diamond Push Up', 2, 4, 'usersetts', 1, 0, 1)" +
+            ",('Pull Up Superman', 3, 2, 1, 'Auf bauch legen, Oberkörper anheben, Pull Up movement', 11, 12, 'usersetts', 2, 0, 1)" +
+            ",('Back Crunch', 2, 1, 1, 'Auf bauch legen, Oberkörper und beine hochziehehn', 12, 15, 'usersetts', 2, 0, 1)" +   //30
+            ",('Rotational Plank', 3, 2, 1, 'Plank, dann einen Arm Zur decke Körper drehen', 5, 6, 'usersetts', 2, 0, 1)" +
+            ",('Triceps Extension', 2, 2, 1, 'Plank mit Armen auf Tisch, nur druch Triceps hochdrücken', 2, 5, 'usersetts', 1, 0, 1)" +
+            ",('Short-Lever Inverted Curl', 2, 2, 1, 'Unter Tisch mit Armen hochziehen', 1, 6, 'usersetts', 2, 0, 1)" +
+            ",('Biceps Chin Up', 4, 2, 6, 'Hände so an Stange, dass Per Bizeps gezogen wird', 1, 15, 'usersetts', 2, 0, 1)" +
+            ",('Three Point Bench Dip', 3, 2, 1, 'Stühle so dass Arme auf einem und Füße auf dem anderen', 2, 6, 'usersetts', 1, 0, 1)" +  //35
+            ",('Push Back', 3, 2, 1, 'Vorbäugen, mit Glutes in der Höhe, nach vorne mit dem Gesicht zum Boden, wegrdücken', 6, 11, 'usersetts', 1, 0, 1)" +
+            ",('Peak Push Up', 3, 2, 1, 'Füße auf Stuhl, Glutes höchstr  Punkt rücken Gerade, push up Bewegung', 6, 2, 'usersetts', 1, 0, 1)" +
+            ",('Crunch', 2, 2, 1, 'Auf Boden, nur durch Bauch Oberkörper hochheben', 5, 14, 'usersetts', 2, 0, 1)" +
+            ",('Side Crunch', 2, 2, 1, 'Auf dem Rücken Beine Angewinklent nach links und rechts absenken', 5, 14, 'usersetts', 1, 0, 1)" +
+            ",('Back Crunch', 2, 2, 1, 'Reverse Crunch auf dem Bauch liegend', 15, 10, 'usersetts', 2, 0, 1)" +  //40
+            ",('Side Plank', 1, 2, 1, 'Seitliche Plan, Hüften senken und Anheben', 5, 14, 'usersetts', 2, 0, 1)" +
+            ",('Sumo Squad', 3, 2, 1, 'Squad, Knie nach ausßen.', 9, 10, 'usersetts', 1, 0, 1)" +
+            ",('Squad', 3, 2, 1, 'Squad.', 9, 10, 'usersetts', 1, 0, 1)" +
+            ",('Pistol Squat', 4, 2, 1, 'Einbeiniger Squad bis zum Boden, Arme ausgestreckt', 9, 8, 'usersetts', 1, 0, 1)" +
+            ",('Dumbbell Overhead Press', 3, 2, 3, 'Dumbells on shoulder, press upwards', 6, 15, 'usersetts', 1, 0, 0)" + //45
+            ",('Leg Press', 4, 2, 2, 'Sitzen, Gewicht mit Beinen drücken.', 10, 9, 'usersetts', 1, 0, 0)" +
+            ",('Lying Leg Curl', 3, 2, 2, 'Liegend auf bauch mit beinen Gewichte heben', 8, 7, 'usersetts', 2, 0, 0)" +
+            ",('Calve Raise', 2, 1, 1, 'Fußspitze auf kante, hochdrücken', 7, 14, 'usersetts', 1, 0, 1)" +
+            ",('Barbell Bent Over Row', 3, 2, 3, 'Vorbeugen, gearder Rücken Hantel hochziehen.', 11, 15, 'usersetts', 2, 0, 0)" +
+            ",('Cable Preacer Curls', 2, 1, 2, 'Vorbeugen, gearder Rücken Hantel hochziehen.', 1, 14, 'usersetts', 2, 0, 0)" + //50
+            ",('Lying Triceps Extension', 3, 1, 3, 'Auf Rücken mit Trieps  Hantel bewegen.', 2, 14, 'usersetts', 1, 0, 1)" +
+            ",('Sitting Leg Curl', 3, 1, 2, 'Sitzend mit beinen Gewichte heben', 8, 7, 'usersetts', 2, 0, 0)" +
             ";";
 
     public static final String SQL_INSERT_PLAN = "INSERT INTO "
@@ -435,10 +453,10 @@ public class FitnessDBContract {
             +"," + PlanEntry.COLUMN_NAME_GOAL
             +"," + PlanEntry.COLUMN_NAME_MUSCLE_GROUP
             +"," + PlanEntry.COLUMN_NAME_RATING
-            + ") VALUES ('PushUpPlan', 2, 8, 5)," +
-            "('TricepsWorkout', 2, 1, 5)" +
-            ",('UpperBody', 1, 8, 2)" +
-            ",('PlanWholeEnd', 3, 2, 2)" +
+            + ") VALUES ('BeginnerFullBodyMass', 3, 7, 5)," +
+            "('BeginnerUpperBody', 3, 8, 5)" +
+            ",('BeginnerLowerBody', 3, 9, 5)" +
+            ",('BeginnerUpperBodySecond', 3, 2, 2)" +
             ",('ArmMaxStrength', 1, 1, 4)" + //5
             ",('BackWorkout', 2, 6, 1)" +
             ",('PlanWholeStrength', 1, 7, 2)" +
@@ -453,18 +471,29 @@ public class FitnessDBContract {
             +"," + PlanExerciseRelationEntry.COLUMN_NAME_REPS
             +"," + PlanExerciseRelationEntry.COLUMN_NAME_SETS
             +"," + PlanExerciseRelationEntry.COLUMN_NAME_WEIGHT
-            +") VALUES (1, 1, 45, 15, 3, 0)" +
-            ",(1, 2, 60, 8, 2, 0)" +
-            ",(1, 4, 90, 10, 4, 0)" +
-            ",(1, 28, 90, 12, 3, 0)" +
-            ",(1, 36, 70, 11, 3, 0)" +
-            ",(2, 3, 60, 15, 4, 0)" +
-            ",(2, 4, 60, 15, 4, 0)" +
-            ",(2, 26, 60, 10, 3, 5)" +
-            ",(3, 6, 180, 6, 4, 80)" +
-            ",(3, 17, 170, 5, 5, 70)" +
-            ",(3, 25, 170, 5, 5, 25)" +
-            ",(3, 5, 170, 5, 4, 35)" +
+            +") VALUES (1, 19, 60, 10, 3, 5)" +
+            ",(1, 21, 50, 10, 3, 5)" +
+            ",(1, 45, 70, 10, 3, 5)" +
+            ",(1, 46, 70, 10, 3, 15)" +
+            ",(1, 47, 60, 10, 3, 10)" +
+            ",(1, 26, 60, 10, 3, 5)" +
+            ",(1, 5, 80, 10, 3, 5)" +
+            ",(1, 48, 40, 12, 3, 0)" +
+            ",(1, 38, 40, 12, 3, 0)" +
+            ",(2, 16, 70, 10, 3, 5)" +
+            ",(2, 4, 80, 10, 3, 15)" +
+            ",(2, 49, 70, 12, 3, 10)" +
+            ",(2, 21, 70, 12, 3, 5)" +
+            ",(2, 45, 60, 10, 3, 5)" +
+            ",(2, 9, 80, 10, 3, 5)" +
+            ",(2, 50, 80, 10, 3, 8)" +
+            ",(2, 51, 80, 10, 3, 5)" +
+            ",(2, 38, 40, 12, 3, 0)" +
+            ",(3, 46, 70, 10, 3, 20)" +
+            ",(3, 47, 65, 10, 3, 10)" +
+            ",(3, 52, 80, 10, 3, 7)" +
+            ",(3, 48, 40, 12, 3, 0)" +
+            ",(3, 42, 60, 10, 3, 0)" +
             ",(4, 1, 20, 12, 3, 0)" +
             ",(4, 3, 15, 12, 3, 0)" +
             ",(4, 5, 15, 12, 3, 25)" +

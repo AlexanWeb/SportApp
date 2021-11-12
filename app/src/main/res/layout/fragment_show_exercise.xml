@@ -80,9 +80,9 @@
         android:textSize="@dimen/target_text_size_small"
         app:layout_constraintTop_toBottomOf="@id/image_show_exercise"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/text_set_show_exercise"
+        app:layout_constraintStart_toEndOf="@+id/text_label_set_show_exercise"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="3"
+        app:layout_constraintHorizontal_weight="8"
         app:layout_constraintVertical_weight="7"/>
 
     <TextView
@@ -97,23 +97,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/text_description_box_show_exercise"
         app:layout_constraintBottom_toTopOf="@id/text_set_show_exercise"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintVertical_weight="1"/>
+        app:layout_constraintVertical_weight="2"
+        app:layout_constraintHorizontal_weight="4"/>
 
     <TextView
+        android:id="@+id/text_set_show_exercise"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="@string/number_placeholder"
-        android:id="@+id/text_set_show_exercise"
         android:layout_marginStart="5dp"
-        android:textSize="@dimen/target_text_size"
+        android:text="@string/number_placeholder"
         android:textAlignment="center"
-        app:layout_constraintTop_toBottomOf="@id/text_label_set_show_exercise"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/text_description_box_show_exercise"
+        android:textSize="@dimen/target_text_size"
         app:layout_constraintBottom_toTopOf="@id/text_label_rep_show_exercise"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintVertical_weight="3"/>
+        app:layout_constraintEnd_toStartOf="@+id/text_description_box_show_exercise"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_label_set_show_exercise"
+        app:layout_constraintVertical_weight="2" />
 
     <TextView
         android:layout_width="0dp"
@@ -127,7 +126,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/text_rep_show_exercise"
         app:layout_constraintEnd_toStartOf="@id/text_description_box_show_exercise"
-        app:layout_constraintVertical_weight="1" />
+        app:layout_constraintVertical_weight="2" />
 
     <TextView
         android:layout_width="0dp"
@@ -141,7 +140,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/text_label_break_show_exercise"
         app:layout_constraintEnd_toStartOf="@id/text_description_box_show_exercise"
-        app:layout_constraintVertical_weight="3"/>
+        app:layout_constraintVertical_weight="2" />
 
     <TextView
         android:layout_width="0dp"
@@ -155,7 +154,7 @@
         app:layout_constraintBottom_toTopOf="@id/text_break_show_exercise"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/text_description_box_show_exercise"
-        app:layout_constraintVertical_weight="1"/>
+        app:layout_constraintVertical_weight="2" />
 
     <TextView
         android:layout_width="0dp"
@@ -169,7 +168,7 @@
         app:layout_constraintBottom_toTopOf="@+id/text_label_weight_show_exercise"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/text_description_box_show_exercise"
-        app:layout_constraintVertical_weight="3"/>
+        app:layout_constraintVertical_weight="2"/>
 
 
     <TextView
@@ -184,8 +183,7 @@
         app:layout_constraintEnd_toStartOf="@id/text_description_box_show_exercise"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_break_show_exercise"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintVertical_weight="1"/>
+        app:layout_constraintVertical_weight="2"/>
 
     <TextView
         android:id="@+id/text_weight_show_exercise"
@@ -199,8 +197,7 @@
         app:layout_constraintEnd_toStartOf="@id/text_description_box_show_exercise"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_label_weight_show_exercise"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintVertical_weight="3"/>
+        app:layout_constraintVertical_weight="2"/>
 
 
 

@@ -158,5 +158,8 @@
         <action
             android:id="@+id/action_fragment_create_exercises_to_fragment_show_exercise"
             app:destination="@id/fragment_show_exercise" />
+        <action
+            android:id="@+id/action_fragment_create_exercises_to_fragment_workout_landing"
+            app:destination="@id/fragment_workout_landing" />
     </fragment>
 </navigation>

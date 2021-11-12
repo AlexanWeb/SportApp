@@ -1,5 +1,6 @@
 package com.example.cbr__fitness.fragments;
 
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.cbr__fitness.R;
@@ -98,6 +100,7 @@ public class EditExercise extends Fragment {
         TextView textEquipment = view.findViewById(R.id.text_equipment_edit_exercise);
         TextView textExerciseType = view.findViewById(R.id.text_exercise_type_edit_exercise);
         TextView textMovementType = view.findViewById(R.id.text_movement_type_edit_exercise);
+        ImageView image = view.findViewById(R.id.image_edit_exercise);
 
         textDescription.setMovementMethod(new ScrollingMovementMethod());
 
@@ -122,6 +125,10 @@ public class EditExercise extends Fragment {
             textExerciseType.setText(exercise.getType().getLabel());
             textMovementType.setText(exercise.getMovementType().getLabel());
             textDescription.setText(exercise.getDescription());
+
+            int id = getResources()
+                    .getIdentifier(exercise.getImagePath(), "drawable", requireContext().getPackageName());
+            image.setImageBitmap(BitmapFactory.decodeResource(getResources(), id));
 
             actionButton.setOnClickListener(v -> {
                 Bundle bundle = new Bundle();

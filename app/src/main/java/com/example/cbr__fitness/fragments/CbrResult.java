@@ -125,16 +125,10 @@ public class CbrResult extends Fragment {
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_show_cbr_exercise_list_results);
 
-        String date = user.toString();
-        date += "  GOAL: " + GoalEnum.getEnumByID(bundle.getInt("goal"))
-                + " GROUP: " + MuscleGroupEnum.getEnumByID(bundle.getInt("group"))
-                + " TIME: " + bundle.getInt("duration");
-
-        TextView headerTextView = view.findViewById(R.id.text_label_cbr_result);
-        headerTextView.setText(date);
         if (doQuery) {
             //Start retrieval by querying for similar users first.
-            List<Pair<User, Double>> similarUser = getUserFromCBR(user);
+            retrievalUtil = new RetrievalUtil(this.getActivity().getFilesDir().getAbsolutePath() + "/");
+            List<Pair<User, Double>> similarUser = CBRConstants.getUserFromCBR(user , retrievalUtil, helper);
             LogUtil.logUserSimilarity(requireContext(),user, similarUser);
             //Get all plans for each user still in the process from the database.
             allPlans = getExerciseListsByUsers(similarUser, bundle, user
@@ -164,35 +158,6 @@ public class CbrResult extends Fragment {
         doQuery = false;
     }
 
-    private List<Pair<User, Double>> getUserFromCBR(User user) {
-
-        retrievalUtil = new RetrievalUtil(this.getActivity().getFilesDir().getAbsolutePath() + "/");
-        List<Pair<User, Double>> users = retrievalUtil.retrieveUser(user);
-        //to finish the similarity of users, get the limitations for each returned user from the cbr query.
-        helper.getLimitationsForListOfUser(users);
-        Iterator<Pair<User,Double>> iterator = users.iterator();
-        while (iterator.hasNext()) {
-            Pair<User,Double> pair = iterator.next();
-
-            double limitationSim = CBRConstants.LimitationSimilarityRelativeToLimitationCount(user.getLimitations()
-                    , pair.getFirst().getLimitations());
-            System.out.println(">>> LIMIT SIM FUER: " + pair.getFirst().getUid() + " VALUE: " + limitationSim);
-            adjustPersonSimilarity(pair, limitationSim);
-            /**
-             * We reduce the returned user count by requiring a certain similarity
-             * No limitation based on number, its unclear at this point how many plans these
-             * users have.
-             */
-
-            if (pair.getSecond() < CBRConstants.USER_SIMILARITY_THRESHOLD) {
-                iterator.remove();
-            }
-        }
-        //Sort the user by their similarity, top to bottom, to enable cutting off those that do not meet a certain threshold.
-        return users.stream()
-                .sorted(Comparator.comparingDouble(Pair<User,Double>::getSecond).reversed()).collect(Collectors.toList());
-    }
-
     /**
      * Returns the exercise lists with their similarity values. Those below the needed threshold will
      * be removed from the list.
@@ -216,19 +181,22 @@ public class CbrResult extends Fragment {
             LogUtil.LogPlanSimilarity(requireContext(), "\t\t>USER SIMILARITY: " + p.getSecond());
             //Multiplication as the input is in minutes but the data is held in seconds.
             planSimilarity += CBRConstants.getSimilarityForDuration(p.getFirst().getDuration()
-                    ,(bundle.getInt("duration")* 60)) /CBRConstants.getCompleteWeightSumPlan();
+                    ,(bundle.getInt("duration")* 60)) /CBRConstants.getCompleteWeights();
             LogUtil.LogPlanSimilarity(requireContext(), "\t\t>DURATION SIMILARITY: " + planSimilarity);
-
-            planSimilarity += CBRConstants.getEquipmentSimilarity(p.getFirst()
-                    .getNeededEquipment(), user.getEquipments()) / CBRConstants.getCompleteWeightSumPlan();
+            planSimilarity += CBRConstants.getEquipmentSimilarity(user.getEquipments(), p.getFirst()
+                    .getNeededEquipment()) / CBRConstants.getCompleteWeights();
             LogUtil.LogPlanSimilarity(requireContext(), "\t\t>EQUIPMENT SIMILARITY: " + planSimilarity);
 
             planSimilarity += CBRConstants.getGoalSimilarity(p.getFirst().getGoal(),
-                    GoalEnum.getEnumByID(bundle.getInt("goal")))/ CBRConstants.getCompleteWeightSumPlan();
+                    GoalEnum.getEnumByID(bundle.getInt("goal")))/ CBRConstants.getCompleteWeights();
             LogUtil.LogPlanSimilarity(requireContext(), "\t\t>GOAL SIMILARITY: " + planSimilarity);
 
-            p.setSecond(p.getSecond() * CBRConstants.WEIGHT_PERSON
-                    + planSimilarity * (1-CBRConstants.WEIGHT_PERSON));
+            p.setSecond(
+                    ((p.getSecond() * CBRConstants.getCompleteWeightSumPerson())
+                            /CBRConstants.getCompleteWeights()) + planSimilarity);
+
+          //  p.setSecond(p.getSecond() * CBRConstants.WEIGHT_PERSON
+          //         + planSimilarity * (1-CBRConstants.WEIGHT_PERSON));
 
             p.setSecond(p.getSecond()* CBRConstants.getMuscleGroupSimilarityMultiplier
                     (MuscleGroupEnum.getEnumByID(bundle.getInt("group")), p.getFirst().getMuscle_group()));
@@ -247,6 +215,7 @@ public class CbrResult extends Fragment {
             LogUtil.LogPlanSimilarity(requireContext(), "\t>Adapting Plan: " + p.getFirst().getPlan_name());
             if (p.getFirst().getGoal() != GoalEnum.getEnumByID(bundle.getInt("goal"))
                     && GoalEnum.getEnumByID(bundle.getInt("goal"))!= GoalEnum.POWER) {
+                LogUtil.LogPlanSimilarity(requireContext(), "\t\t\t>Adapting GOAL: " + p.getFirst().getPlan_name());
                 adaptForGoal(p.getFirst(),bundle);
             }
             ListIterator<Exercise> ite = p.getFirst().getExercises().listIterator();
@@ -272,7 +241,9 @@ public class CbrResult extends Fragment {
                             exchange.setBreakTime(e.getBreakTime());
                         } else {
                             LogUtil.LogPlanSimilarity(requireContext(), "\t\t\t>No Match, try estimation! ");
-                            adaptExerciseAfter(similarExercises, exchange);
+                            CBRConstants.adaptExerciseAfter(similarExercises, exchange, requireContext()
+                                    , CBRConstants.initExerciseValues(GoalEnum.getEnumByID(bundle.getInt("goal"))
+                                            , user.getWorkoutTypeN()));
                         }
                         ite.remove();
                         ite.add(exchange);
@@ -285,7 +256,8 @@ public class CbrResult extends Fragment {
     private void adaptForGoal (ExerciseList exerciseList, Bundle bundle) {
         for (Exercise e : exerciseList.getExercises()) {
             List<Exercise> exercises = getSimilarExercisesForAdaption(e, bundle);
-            adaptExerciseAfter(exercises, e);
+            CBRConstants.adaptExerciseAfter(exercises, e, requireContext()
+                    , CBRConstants.initExerciseValues(GoalEnum.getEnumByID(bundle.getInt("goal")), user.getWorkoutTypeN()));
         }
         exerciseList.setGoal(bundle.getInt("goal"));
     }
@@ -294,7 +266,8 @@ public class CbrResult extends Fragment {
         List<Exercise> similarExercises = new ArrayList<>();
 
         for (Pair<ExerciseList, Double> p : allPlans) {
-            if (p.getFirst().getGoal() ==  GoalEnum.getEnumByID(bundle.getInt("goal"))) {
+            if (p.getFirst().getGoal() ==  GoalEnum.getEnumByID(bundle.getInt("goal"))
+                    && p.getFirst().getPlan_id() != exchange.getPlanID()) {
                 for (Exercise e : p.getFirst().getExercises()) {
                     if (e.getMuscle() == exchange.getMuscle()
                             && e.isBodyweight() == exchange.isBodyweight()) { //Exercise targeting same muscle with same goal
@@ -308,42 +281,7 @@ public class CbrResult extends Fragment {
                 }
             }
         }
-
         return similarExercises;
-    }
-
-    private void adaptExerciseAfter (List<Exercise> similarExercises, Exercise exchanged) {
-        int sumSets = 0;
-        int sumReps = 0;
-        int sumWeight = 0;
-        int sumBreakTime = 0;
-        if (similarExercises.size() > 0) {
-            for (Exercise e : similarExercises) {
-                LogUtil.LogPlanSimilarity(requireContext(), "\t\t\t>Taking Values from: " + e.getName()
-                        + "\n\t\t\tSets: " + e.getSetNumber() + " Reps: "
-                        + e.getRepNumber() + " Weight: " + e.getWeight()
-                        + " Break Time: " + e.getBreakTime());
-                sumReps += e.getRepNumber();
-                sumSets += e.getSetNumber();
-                sumWeight += e.getWeight();
-                sumBreakTime += e.getBreakTime();
-            }
-        } else {
-            System.out.println("<<<<<<<<<<<<<<<<<<<< NOT WORKING");
-        }
-        exchanged.setWeight(similarExercises.size() == 0 ? sumWeight : sumWeight/similarExercises.size());
-        exchanged.setSetNumber(similarExercises.size() == 0 ? sumSets : sumSets/similarExercises.size());
-        exchanged.setRepNumber(similarExercises.size() == 0 ? sumReps : sumReps/similarExercises.size());
-        exchanged.setBreakTime(similarExercises.size() == 0 ? sumBreakTime : sumBreakTime/similarExercises.size());
-    }
-
-    private void adjustPersonSimilarity(Pair<User, Double> user, double limitationSim) {
-        double pastSim = user.getSecond();
-        System.out.println(">>>> SIM PRE LIMITATION: " + pastSim);
-        pastSim *= CBRConstants.getCompleteWeightSumMyCBRPerson(); //denormalize the sum by multiplying with the sum of weights used in the CBR query
-        pastSim += CBRConstants.WEIGHT_LIMITATION * limitationSim;
-        System.out.println(">>>> SIM AFTER LIMITATION: " + pastSim/CBRConstants.getCompleteWeightSumPerson());
-        user.setSecond(pastSim/CBRConstants.getCompleteWeightSumPerson()); //already consider duration weight
     }
 
     /**

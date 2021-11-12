@@ -10,6 +10,7 @@ import com.example.cbr__fitness.data.ResultCaseUser;
 import com.example.cbr__fitness.data.User;
 import com.example.cbr__fitness.databasehelper.FitnessDBSqliteHelper;
 import com.example.cbr__fitness.enums.EquipmentEnum;
+import com.example.cbr__fitness.enums.ExerciseTypeEnum;
 import com.example.cbr__fitness.enums.GenderEnum;
 import com.example.cbr__fitness.enums.GoalEnum;
 import com.example.cbr__fitness.enums.MuscleEnum;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -77,7 +79,6 @@ public class RetrievalUtil {
         this.project = engine.createProjectFromPRJ(path);
         this.cbUser = (DefaultCaseBase) project.getCaseBases().get(CBREngine.getCaseBaseUser());
         this.cbExercise = (DefaultCaseBase) project.getCaseBases().get(CBREngine.getCasebaseExercise());
-        System.out.println(">>>Got the case bases successfully");
         this.myConceptUser = project.getConceptByID(CBREngine.getConceptNameUser());
         this.myConceptExercise = project.getConceptByID(CBREngine.getConceptNameExercise());
     }
@@ -100,7 +101,7 @@ public class RetrievalUtil {
         myConceptExercise.getActiveAmalgamFct().setWeight(equipment, CBRConstants.WEIGHT_EQUIPMENT);
         IntegerDesc exerciseID = (IntegerDesc) myConceptExercise.getAllAttributeDescs().get("exerciseID");
         myConceptExercise.getActiveAmalgamFct().setActive(exerciseID, false);
-        SymbolDesc exerciseType = (SymbolDesc) myConceptExercise.getAllAttributeDescs().get("exercise_type");
+        BooleanDesc exerciseType = (BooleanDesc) myConceptExercise.getAllAttributeDescs().get("is_multijoint");
         myConceptExercise.getActiveAmalgamFct().setWeight(exerciseType, CBRConstants.WEIGHT_EXERCISE_TYPE);
         BooleanDesc isExplosive = (BooleanDesc) myConceptExercise.getAllAttributeDescs().get("is_explosive");
         myConceptExercise.getActiveAmalgamFct().setWeight(isExplosive, CBRConstants.WEIGHT_IS_EXPLOSIVE);
@@ -120,8 +121,7 @@ public class RetrievalUtil {
             }
             MultipleAttribute<AttributeDesc> equipments = new MultipleAttribute<>(equipment, attributes);
             boolean added = query.addAttribute(equipment, equipments);
-            System.out.println("Successfully Added: " + added);
-            query.addAttribute(exerciseType, exercise.getType().getSymbol());
+            query.addAttribute(exerciseType, (exercise.getType()== ExerciseTypeEnum.multiJoint));
             query.addAttribute(isExplosive, exercise.getIsExplosive());
             query.addAttribute(movementType, exercise.getMovementType().getLabel());
             query.addAttribute(primaryMuscle, exercise.getMuscle().getSymbol());
@@ -130,15 +130,12 @@ public class RetrievalUtil {
         } catch (ParseException exe) {
             System.out.println("Parse Excep: " + exe);
         }
-        for (AttributeDesc des : query.getAttributes().keySet()) {
-            System.out.println("Desc: " + des.getName() + " VALUE: " + query.getAttributes().get(des).getValueAsString());
-        }
+
         ret.start();
         List<Pair<Instance, Similarity>> result = ret.getResult();
 
 
         if (result.size() > 0) {
-            System.out.println(">>>GOT A RESULT");
             List<Pair<Integer, Double>> exerciseIDs = new ArrayList<>();
             for (Pair<Instance, Similarity> p : result) {
                 if (Integer.parseInt(p.getFirst().getAttributes().get(exerciseID).getValueAsString())
@@ -151,6 +148,7 @@ public class RetrievalUtil {
                 }
             }
             similarExercises = helper.completeExerciseQueryResults(exerciseIDs);
+            similarExercises.removeIf(temp -> !equipmentList.contains(temp.getFirst().getEquipment()));
         }
         //Order the exercises left for consideration.
         return similarExercises.stream()
@@ -203,7 +201,6 @@ public class RetrievalUtil {
         List<Pair<Instance, Similarity>> result = ret.getResult();
 
         if (result.size() > 0) {
-            System.out.println(">>>GOT A RESULT");
             for (Pair<Instance, Similarity> p : result) {
                 if (Integer.parseInt(p.getFirst().getAttributes().get(userID).getValueAsString()) != loggedUser.getUid()) {
                     similarUser.add(new Pair<>(new User(
@@ -271,7 +268,6 @@ public class RetrievalUtil {
 
         // Speichern der Ergebnisse in Arraylist.
         if (result.size() > 0) {
-            System.out.println(">>>GOT A RESULT");
             for (int i = 0; i < result.size(); i++) {
                 ResultCaseUser rc = new ResultCaseUser(result.get(i).getFirst().getName(),
                         result.get(i).getSecond().getValue(),
@@ -440,7 +436,6 @@ public class RetrievalUtil {
             // Attribute werden durch Amalgam-Funktion gewichtet.
             for (AttributeDesc desc : instance.getAttributes().keySet()) {
                 if (desc.getName().contains(attr.getName())) {
-                    System.out.println("sett attr weight for: " + desc.getName() + " to: " + weight);
                     myConceptUser.getActiveAmalgamFct().setWeight(desc, weight);
                     if (weight == 0) {
                         myConceptUser.getActiveAmalgamFct().setActive(desc, false);

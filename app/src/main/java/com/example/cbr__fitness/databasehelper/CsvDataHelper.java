@@ -14,7 +14,7 @@ public class CsvDataHelper {
     public static final String exerciseCsvName = "exerciseCsv.csv";
 
     public static final String firstLineExerciseCsv = "exerciseID;primary_muscle;secondary_muscle" +
-            ";exercise_type;equipment;movement_type;is_explosive;is_bodyweight\n";
+            ";is_multijoint;equipment;movement_type;is_explosive;is_bodyweight\n";
 
     public static String getFirstLine(ToCaseCsvInterface object) {
         if (object instanceof User) {

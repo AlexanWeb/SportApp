@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 
 import com.example.cbr__fitness.R;
+import com.example.cbr__fitness.cbr.CBRConstants;
 import com.example.cbr__fitness.cbr.RetrievalUtil;
 import com.example.cbr__fitness.customListenerMethods.ColorChangeToggleListener;
 import com.example.cbr__fitness.customViewElements.ColorChangeToggleButton;
@@ -26,12 +27,15 @@ import com.example.cbr__fitness.data.Plan;
 import com.example.cbr__fitness.data.User;
 import com.example.cbr__fitness.databasehelper.FitnessDBSqliteHelper;
 import com.example.cbr__fitness.enums.EquipmentEnum;
+import com.example.cbr__fitness.enums.GoalEnum;
+import com.example.cbr__fitness.logic.LogUtil;
 import com.example.cbr__fitness.logic.SharedPreferenceManager;
 import com.example.cbr__fitness.viewModels.ExerciseListViewModel;
 import com.example.cbr__fitness.viewModels.ExerciseViewModel;
 import com.example.cbr__fitness.viewModels.PlanViewModel;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.dfki.mycbr.util.Pair;
@@ -43,11 +47,17 @@ import de.dfki.mycbr.util.Pair;
  */
 public class ExchangeExercise extends Fragment {
 
-    List<ColorChangeToggleButton> equipmentButtons;
+    private List<ColorChangeToggleButton> equipmentButtons;
 
-    FitnessDBSqliteHelper helper;
+    private FitnessDBSqliteHelper helper;
 
-    ExerciseViewModel model;
+    private ExerciseViewModel model;
+
+    private RetrievalUtil util;
+
+    private User user;
+
+    private ExerciseList exerciseList;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -99,15 +109,16 @@ public class ExchangeExercise extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        RetrievalUtil util = new RetrievalUtil(this.getActivity().getFilesDir().getAbsolutePath() + "/");
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>GOT GESTEROASDF");
+        util = new RetrievalUtil(this.getActivity().getFilesDir().getAbsolutePath() + "/");
         helper = new FitnessDBSqliteHelper(requireContext());
+
         int id = SharedPreferenceManager.getLoggedUserID(requireContext());
-        User user = helper.getUserById(id);
+        user = helper.getUserById(id);
 
         List<EquipmentEnum> equipments = new ArrayList<>();
 
-        ExerciseList exerciseList = new ViewModelProvider(requireActivity()).get(PlanViewModel.class).getSelected().getValue();
+        exerciseList = new ViewModelProvider(requireActivity()).get(PlanViewModel.class).getSelected().getValue();
 
 
         model = new ViewModelProvider(requireActivity()).get(ExerciseViewModel.class);
@@ -134,14 +145,47 @@ public class ExchangeExercise extends Fragment {
             }
             List<Pair<Exercise, Double>> retrievedExercises = util.retrieveExercise(helper
                     , model.getSelected().getValue() , equipments, exerciseList.getAllExerciseIDs());
+
+            retrievedExercises.removeIf(p -> !(p.getFirst().getMuscle() == model.getSelected().getValue().getMuscle()));
+
+            List<Pair<User, Double>> users = CBRConstants.getUserFromCBR(user,util,helper);
+            List<Pair<ExerciseList, Double>> exerciseListsUsers = helper.getPlansForCBRUsers(users);
+            //gets all plans with the same goal as the one to be adapted
+            exerciseListsUsers.removeIf(p -> p.getFirst().getGoal() != exerciseList.getGoal());
+
             for (Pair<Exercise, Double> p : retrievedExercises) {
-                if (p.getFirst() != null) {
-                    System.out.println("Exercise: " + p.getFirst().getName() + " SIM : " + p.getSecond() ) ;
-                }
+                adaptForSimilarExercise(p.getFirst(), exerciseListsUsers);
             }
+
             ExerciseListViewModel viewModel = new ViewModelProvider(requireActivity()).get(ExerciseListViewModel.class);
             viewModel.addExercise(retrievedExercises);
+            helper.close();
             Navigation.findNavController(view).navigate(R.id.action_fragment_exchange_exercise_to_fragment_exchange_exercise_cbr_result);
         });
+    }
+
+    private void adaptForSimilarExercise(Exercise exercise, List<Pair<ExerciseList, Double>> lists) {
+        List<Exercise> similarExercises = new ArrayList<>();
+        for (Pair<ExerciseList, Double> p : lists) {
+            for (Exercise e : p.getFirst().getExercises()) {
+                if (e.getMuscle() == exercise.getMuscle()
+                        && e.isBodyweight() == exercise.isBodyweight()) { //Exercise targeting same muscle with same goal
+                    LogUtil.LogPlanSimilarity(requireContext(), "\t\t\t>Looking for similar to Create: "
+                            + exercise.getName() + " Bodyweight: "+ exercise.isBodyweight()
+                            +" Muscle: " + exercise.getMuscle().getLabel() + " FOUND: "
+                            + e.getName() + " Bodyweigt : " + e.isBodyweight() + " MUSCLE: "
+                            + e.getMuscle().getLabel() + " FROM Plan: " + p.getFirst().getPlan_id());
+                    similarExercises.add(e);
+                }
+            }
+        }
+        CBRConstants.adaptExerciseAfter(similarExercises,exercise,requireContext()
+                , CBRConstants.initExerciseValues(exerciseList.getGoal(), user.getWorkoutTypeN()));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        helper.close();
     }
 }

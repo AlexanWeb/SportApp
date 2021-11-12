@@ -121,9 +121,7 @@ public class ExerciseList extends ArrayList<Exercise> implements Parcelable {
         int duration = 0;
         for (Exercise e : exercises) {
             duration += e.getDuration();
-            System.out.println("EXERCISE: " + e.getName() + " Sets: " + e.getSetNumber() +" BreakTime: " + e.getBreakTime());
         }
-        System.out.println("Sum: " + duration);
         return duration;
     }
 

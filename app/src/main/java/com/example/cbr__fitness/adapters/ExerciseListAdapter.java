@@ -57,7 +57,7 @@ public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapte
         textWorkoutGoal.setText(list.getGoal().getLabel());
 
         for (EquipmentEnum e : list.getNeededEquipment()) {
-            System.out.println("NEEDING: " + e.getLabel());
+            //System.out.println("NEEDING: " + e.getLabel());
             TextView t = new TextView(context);
             t.setText(e.getLabel());
             t.setText(e.getLabel());

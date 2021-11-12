@@ -127,7 +127,6 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
         long id  = db.insert(FitnessDBContract.UserEntry.TABLE_NAME, null, userValues);
 
         for (int r : restrictionsIDs) {
-            System.out.println("<<<<<<<<<<<<<<<<< ADDING RESTRICTION: " + r + " FOR USER " + id);
             ContentValues limitValues = new ContentValues();
             limitValues.put(FitnessDBContract.LimitationsUserRelation.COLUMN_NAME_UID, id);
             limitValues.put(FitnessDBContract.LimitationsUserRelation.COLUMN_NAME_LID, r);
@@ -136,7 +135,6 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
         }
         equipmentIDs.add(1); //"Keins" is default added to every user as everyone should have no eq.
         for (int r :equipmentIDs) {
-            System.out.println("<<<<<<<<<<<<<<<<<<<<<<< ADDING EQUIPMENT " + r + " FOR USER " + id);
             ContentValues equipmentValues = new ContentValues();
             equipmentValues.put(FitnessDBContract.UserEquipmentRelation.COLUMN_NAME_EQ_ID, r);
             equipmentValues.put(FitnessDBContract.UserEquipmentRelation.COLUMN_NAME_UID, id);
@@ -159,7 +157,6 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
         Cursor cursor = doAndroidQuery(db, FitnessDBContract.UserEntry.TABLE_NAME, null
                 , selection, selectionArgs, null, null, null);
 
-        System.out.println("--------------------- NUMBER OF RETURNED ROW: " + cursor.getCount());
         available = (cursor.getCount() == 0);
 
         cursor.close();
@@ -264,8 +261,6 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
                         , cursor.getInt(4), cursor.getInt(5)
                         ,cursor.getString(3)));
             }
-        } else {
-            System.out.println("RUNNING BUT MISSED");
         }
 
         String completeQuery = completePlanExerciseQuery(exercises);
@@ -275,7 +270,7 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
             System.out.println("PARAMETER: " + parameters[i]);
         }
         Cursor exerciseCursor = db.rawQuery(completeQuery,parameters);
-        System.out.println("CURSOR COUT: " + exerciseCursor.getCount() + " STATEMENT: " + completeQuery);
+        //System.out.println("CURSOR COUT: " + exerciseCursor.getCount() + " STATEMENT: " + completeQuery);
         if (exerciseCursor.getCount() > 0) {
             List<Exercise> exerciseList = cursorToExercises(exerciseCursor);
             for (ExerciseList el : exercises) {
@@ -321,7 +316,7 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
         List<Exercise> exercises = new ArrayList<>();
 
         while(cursor.moveToNext()) {
-                System.out.println("COLUMNS: " + cursor.getColumnCount()
+             /*   System.out.println("COLUMNS: " + cursor.getColumnCount()
                         + " NAMES: " + cursor.getColumnName(0) + ", "  //int
                         + cursor.getColumnName(1) + ", "               //int
                         + cursor.getColumnName(2) + ", "               //int
@@ -336,7 +331,7 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
                         + cursor.getColumnName(11) + ", "           //String
                         + cursor.getColumnName(12) + ", "           //String
                         + cursor.getColumnName(13) + ", "              //int
-                        + cursor.getColumnName(14) + ", ");            //int
+                        + cursor.getColumnName(14) + ", ");            //int */
             //pid, eid, sets, reps, break, weight, eid, title, prime_muscle, exercise_type
             // explanation, illustration_link, equipment, duration_rep
             exercises.add(new Exercise(cursor.getInt(0), cursor.getInt(1)
@@ -347,9 +342,8 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
                     , cursor.getInt(14), ExerciseTypeEnum.getEnumByInt(cursor.getInt(10))
                     , EquipmentEnum.getEnumById(cursor.getInt(13))
                     , cursor.getString(11),MovementTypeEnum.getEnumById(cursor.getInt(15))
-                    , (cursor.getInt(16) == 1), (cursor.getInt(17) == 1))); // done as 0 represents false as would be the expression.
-
-            System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<:  EXERCISE WEIGHT " + cursor.getInt(6));
+                    , (cursor.getInt(16) == 1), (cursor.getInt(17) == 1)// done as 0 represents false as would be the expression.
+                            , cursor.getString(12)));
         }
 
         return exercises;
@@ -429,14 +423,14 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
                 , selection, selectionArgs, null, null, null);
 
         if (cursorUser.moveToFirst()) {
-            System.out.println("COLUMNS: " + cursorUser.getColumnCount()
-                    + " NAMES: " + cursorUser.getColumnName(0) + ", "  //int
+          /*  System.out.println("COLUMNS: " + cursorUser.getColumnCount()
+                   + " NAMES: " + cursorUser.getColumnName(0) + ", "  //int
                     + cursorUser.getColumnName(1) + ", "               //int
                     + cursorUser.getColumnName(2) + ", "               //int
                     + cursorUser.getColumnName(3) + ", "               //int
                     + cursorUser.getColumnName(4) + ", "               //int
                     + cursorUser.getColumnName(5) + ", "               //int
-                    + cursorUser.getColumnName(6));
+                    + cursorUser.getColumnName(6)); */
             user = new User(cursorUser.getInt(0), cursorUser.getString(1)
                     ,cursorUser.getInt(2), GenderEnum.getEnumById(cursorUser.getInt(5))
                     , cursorUser.getInt(3), cursorUser.getInt(4)
@@ -463,6 +457,8 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
 
         List<Integer> rolls = getRollsByUserId(db, id);
 
+        db.close();
+
         return rolls;
     }
 
@@ -483,6 +479,7 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
             rolls.add(cursor.getInt(0));
         }
         System.out.println("<<<<<<<<<<: " + rolls.size() + " FOR USED: " + id);
+        cursor.close();
         return rolls;
     }
 
@@ -528,6 +525,7 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
             System.out.println(LimitationEnum.getEnumByID(cursor.getInt(0)).getLabel());
         }
 
+        cursor.close();
         return limitations;
     }
 
@@ -544,6 +542,8 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
         while(cursor.moveToNext()){
             equipmentEnumList.add(EquipmentEnum.getEnumById(cursor.getInt(0)));
         }
+
+        cursor.close();
 
         return equipmentEnumList;
     }
@@ -588,6 +588,7 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
                     , WorkoutEnum.getEnumById(cursor.getInt(6))));
         }
 
+        cursor.close();
         db.close();
         return allUser;
     }
@@ -622,9 +623,11 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
                     , ExerciseTypeEnum.getEnumByInt(cursor.getInt(4))
                     , EquipmentEnum.getEnumById(cursor.getInt(7)), cursor.getString(5)
                     , MovementTypeEnum.getEnumById(cursor.getInt(6))
-                    , (cursor.getInt(10)==1), (cursor.getInt(11)==1)));
+                    , (cursor.getInt(10)==1), (cursor.getInt(11)==1)
+                    , cursor.getString(8)));
         }
 
+        cursor.close();
         db.close();
         return  allExercises;
     }
@@ -712,24 +715,28 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
                     , cursor.getInt(8), ExerciseTypeEnum.getEnumByInt(cursor.getInt(4))
                     , EquipmentEnum.getEnumById(cursor.getInt(7)), cursor.getString(5)
                     , MovementTypeEnum.getEnumById(cursor.getInt(9))
-                    , (cursor.getInt(10) == 1), (cursor.getInt(11) == 1));
+                    , (cursor.getInt(10) == 1), (cursor.getInt(11) == 1)
+                    , cursor.getString(6));
         }
 
         cursor.close();
         return exercise;
     }
 
-    public void updatePlanExerciseRelation (int pid, int eid, int oldEid) {
+    public void updatePlanExerciseRelation (int pid, Exercise newExercise, Exercise oldExercise) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(FitnessDBContract.PlanExerciseRelationEntry.COLUMN_NAME_EID, eid);
+        values.put(FitnessDBContract.PlanExerciseRelationEntry.COLUMN_NAME_EID, newExercise.getExerciseID());
+        values.put(FitnessDBContract.PlanExerciseRelationEntry.COLUMN_NAME_REPS, newExercise.getRepNumber());
+        values.put(FitnessDBContract.PlanExerciseRelationEntry.COLUMN_NAME_SETS, newExercise.getSetNumber());
+        values.put(FitnessDBContract.PlanExerciseRelationEntry.COLUMN_NAME_BREAK, newExercise.getBreakTime());
+        values.put(FitnessDBContract.PlanExerciseRelationEntry.COLUMN_NAME_WEIGHT, newExercise.getWeight());
 
-        db.update(FitnessDBContract.PlanExerciseRelationEntry.TABLE_NAME, values
+        int update = db.update(FitnessDBContract.PlanExerciseRelationEntry.TABLE_NAME, values
                 , FitnessDBContract.PlanExerciseRelationEntry.COLUMN_NAME_EID + " = ? AND "
                         + FitnessDBContract.PlanExerciseRelationEntry.COLUMN_NAME_PID + " = ?"
-                , new String[]{Integer.toString(oldEid), Integer.toString(pid)});
-
+                , new String[]{Integer.toString(oldExercise.getExerciseID()), Integer.toString(pid)});
         db.close();
     }
 
@@ -747,7 +754,7 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
     public ExerciseList getExerciseListByID(int pid, int uid, int eid) {
         SQLiteDatabase db = getReadableDatabase();
 
-        System.out.println("GEtting new plan for :" + pid + " udi: " + uid);
+        System.out.println("Getting new plan for :" + pid + " udi: " + uid);
 
         String[] values = { Integer.toString(uid), Integer.toString(pid) };
 
@@ -755,13 +762,6 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
 
         Cursor cursor = db.rawQuery(SQL_GET_PLAN_BY_ID, values);
         while(cursor.moveToNext()) {
-            System.out.println(cursor.getColumnName(0));
-            System.out.println(cursor.getColumnName(1));
-            System.out.println(cursor.getColumnName(2));
-            System.out.println(cursor.getColumnName(3));
-            System.out.println(cursor.getColumnName(4));
-            System.out.println(cursor.getColumnName(5));
-            System.out.println(cursor.getColumnName(6));
             plan = new ExerciseList(cursor.getInt(2)
                     , cursor.getInt(4), cursor.getInt(5)
                     ,cursor.getString(3));
@@ -852,6 +852,7 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
 
         List<Exercise> exercises = cursorToBasicExercise(cursor);
 
+        cursor.close();
         db.close();
         return  exercises;
     }
@@ -864,7 +865,7 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
 
         while (cursor.moveToNext()) {
 
-            System.out.println("COLUMNS: " + cursor.getColumnCount()
+            /* System.out.println("COLUMNS: " + cursor.getColumnCount() + " For Exercises "
                     + " NAMES: " + cursor.getColumnName(0) + ", "  //int
                     + cursor.getColumnName(1) + ", "               //int
                     + cursor.getColumnName(2) + ", "               //int
@@ -877,9 +878,10 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
                     + cursor.getColumnName(9) + ", "               //int
                     + cursor.getColumnName(10) + ", "              //int
                     + cursor.getColumnName(11) + ", "           //String
-                );
-            //pid, eid, sets, reps, break, weight, eid, title, prime_muscle, exercise_type
-            // explanation, illustration_link, equipment, duration_rep
+             );*/
+
+            // eid, title, prime_muscle, secondary_muscle, exercise_type, explanation, illustration_link
+            // , equipment, duration_rep, movement_type, is_explosive, is_bodyweight,
  // done as 0 represents false as would be the expression.
             exercises.add(new Exercise(0, cursor.getInt(0)
                     , cursor.getString(1), 0, 0, 0, 0
@@ -888,11 +890,13 @@ public class FitnessDBSqliteHelper extends SQLiteOpenHelper {
                     , cursor.getInt(8), ExerciseTypeEnum.getEnumByInt(cursor.getInt(4))
                     , EquipmentEnum.getEnumById(cursor.getInt(7))
                     , cursor.getString(5), MovementTypeEnum.getEnumById(cursor.getInt(9))
-                    , (cursor.getInt(10) == 1), (cursor.getInt(11) == 1)));
+                    , (cursor.getInt(10) == 1), (cursor.getInt(11) == 1)
+                    , cursor.getString(6)));
         }
 
         return exercises;
     }
+
 
     /**
      * Method to aggregate the DB.query calls that can be done via the android provided SQL helper.

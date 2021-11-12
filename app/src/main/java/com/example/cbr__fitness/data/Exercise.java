@@ -38,6 +38,7 @@ public class Exercise implements ToCaseCsvInterface {
     private int repTime;
     private ExerciseTypeEnum type;
     private String description;
+    private String imagePath;
     private EquipmentEnum equipment;
     private MovementTypeEnum movementType;
     boolean isBodyweight;
@@ -123,7 +124,7 @@ public class Exercise implements ToCaseCsvInterface {
     public Exercise(int plan_id, int exerciseID , String name, int setNumber, int repNumber
             , int breakTime, int weight, MuscleEnum muscle, MuscleEnum secondaryMuscle, int repTime
             , ExerciseTypeEnum type, EquipmentEnum equipment, String description
-            , MovementTypeEnum movementType, boolean isExplosive, boolean isBodyweight) {
+            , MovementTypeEnum movementType, boolean isExplosive, boolean isBodyweight, String imagePath) {
         this.planID = plan_id;
         this.exerciseID = exerciseID;
         this.name = name;
@@ -140,14 +141,15 @@ public class Exercise implements ToCaseCsvInterface {
         this.movementType = movementType;
         this.isExplosive = isExplosive;
         this.isBodyweight = isBodyweight;
+        this.imagePath = imagePath;
     }
 
     public Exercise(int exerciseID , String name, MuscleEnum muscle, MuscleEnum secondaryMuscle, int repTime
             , ExerciseTypeEnum type, EquipmentEnum equipment, String description
-            , MovementTypeEnum movementType, boolean isExplosive, boolean isBodyweight) {
+            , MovementTypeEnum movementType, boolean isExplosive, boolean isBodyweight, String imagePath) {
         this(-1, exerciseID, name, 0, 0, 0, 0, muscle
                 , secondaryMuscle, repTime, type, equipment, description, movementType
-                , isExplosive, isBodyweight);
+                , isExplosive, isBodyweight, imagePath);
     }
 
     public void setBreakTime(int breakTime) {
@@ -168,6 +170,10 @@ public class Exercise implements ToCaseCsvInterface {
 
     public int getExerciseID() {
         return exerciseID;
+    }
+
+    public String getImagePath() {
+        return imagePath;
     }
 
     public MuscleEnum getSecondaryMuscle(){
@@ -191,10 +197,10 @@ public class Exercise implements ToCaseCsvInterface {
     public MovementTypeEnum getMovementType() {
         return movementType;
     }
-    // "exerciseID;primary_muscle;secondary_muscle;exercise_type;equipment;movement_type;is_explosive;is_bodyweight\n"
+    // "exerciseID;primary_muscle;secondary_muscle;is_multijoint;equipment;movement_type;is_explosive;is_bodyweight\n"
     public String toCsvCase() {
         return  exerciseID + ";" + muscle.getSymbol() + ";" + secondaryMuscle.getSymbol()
-                + ";" + type.getSymbol() + ";" + equipment.getSymbol() + ";" + movementType.getLabel()
+                + ";" + (type == ExerciseTypeEnum.multiJoint) + ";" + equipment.getSymbol() + ";" + movementType.getLabel()
                 + ";" + isExplosive + ";" + isBodyweight
                 + "\n";
     }

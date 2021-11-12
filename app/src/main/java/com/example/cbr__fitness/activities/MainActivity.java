@@ -78,13 +78,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Datensätze werden geladen.
-        loadDatabases();
+        checkCBRProject(true);
+        //loadDatabases();
     }
 
     public void loginClick (View v) {
 
         FitnessDBSqliteHelper helper = new FitnessDBSqliteHelper(this);
-        helper.getReadableDatabase();
+        //helper.getReadableDatabase();
         SharedPreferenceManager.resetRolls(this);
         userLogged = null;
         userList = cbrFitnessUtil.getUserList(cbrFitnessUtil.loadAll("userBase.txt", MainActivity.this));
@@ -122,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Username or Password is missing!", Toast.LENGTH_SHORT).show();
         }
+        helper.close();
     }
 
     public void createAccountClick(View v) {
@@ -158,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkCBRProject (boolean overwrite) {
         boolean found = false;
         File assetCBR = null;
+        System.out.println("Updateing the CBR Project");
         //Check if there already is a CBR Project inside the local storage.
         for(File f : getFilesDir().listFiles()) {
             if (f.getName().equals("CBR_Fitness.prj")) {
@@ -168,8 +171,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (!found || overwrite) {
             AssetManager manager = this.getAssets();
-            InputStream in = null;
-            OutputStream out = null;
+            InputStream in;
+            OutputStream out;
             try {
                 in = manager.open("CBR_Fitness.prj");
                 String newFile = getFilesDir().getAbsolutePath() + "/CBR_Fitness.prj";
@@ -183,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 out.flush();
                 out.close();
             } catch (IOException exc){
-                System.out.println("###########");
+                System.out.println("FATAL ERROR CASE BASE NOT PROPERLY OVERWRITTEM");
             }
         }
     }

@@ -22,7 +22,6 @@ public enum GoalEnum implements EnumInterface {
 
     private static Map<Integer, GoalEnum> goalEnumMap = new HashMap<>();
 
-
     static {
         for (GoalEnum goalEnum : GoalEnum.values()) {
             goalEnumMap.put(goalEnum.getID(), goalEnum);

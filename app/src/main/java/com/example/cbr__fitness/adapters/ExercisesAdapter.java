@@ -42,7 +42,6 @@ public class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.Exer
         TextView exerciseTitle = holder.exerciseTitleView;
         exerciseTitle.setText(exercise.getName());
         TextView exercisePrimeMuscle = holder.exercisePrimeMuscle;
-        System.out.println("PRIME MUSCLE THING: " + (exercisePrimeMuscle == null));
         exercisePrimeMuscle.setText(exercise.getMuscle().toString());
         TextView setTextView = holder.setTextView;
         setTextView.setText("Sets: " + Integer.toString(exercise.getSetNumber()));

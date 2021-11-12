@@ -1,5 +1,7 @@
 package com.example.cbr__fitness.fragments;
 
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.cbr__fitness.R;
@@ -90,6 +93,8 @@ public class ShowExercise extends Fragment {
         TextView textExerciseType = view.findViewById(R.id.text_exercise_type_show_exercise);
         TextView textMovementType = view.findViewById(R.id.text_movement_type_show_exercise);
 
+        ImageView image = view.findViewById(R.id.image_show_exercise);
+
         FloatingActionButton actionButton = view.findViewById(R.id.floating_edit_show_exercise);
 
         Bundle bundle = getArguments();
@@ -110,6 +115,10 @@ public class ShowExercise extends Fragment {
             textDescription.setText(item.getDescription());
             textMovementType.setText(item.getMovementType().getLabel());
             textDescription.setMovementMethod(new ScrollingMovementMethod());
+
+            int id = getResources()
+                    .getIdentifier(item.getImagePath(), "drawable", requireContext().getPackageName());
+            image.setImageBitmap(BitmapFactory.decodeResource(getResources(), id));
 
             actionButton.setOnClickListener(new View.OnClickListener() {
                 @Override

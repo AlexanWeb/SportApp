@@ -133,10 +133,6 @@ public class ExchangeExerciseCbrResult extends Fragment {
                 Navigation.findNavController(view).navigate(R.id.action_fragment_exchange_exercise_cbr_result_to_fragment_show_exercise, bundleList);
             });
         });
-
-
-
-
     }
 
     /**
@@ -144,10 +140,15 @@ public class ExchangeExerciseCbrResult extends Fragment {
      * @param newExercise
      */
     private void updateDBPlanWithNewExercise(int pid, Exercise newExercise, Exercise oldExercise) {
-        helper.updatePlanExerciseRelation(pid, newExercise.getExerciseID(), oldExercise.getExerciseID());
+        helper.updatePlanExerciseRelation(pid, newExercise, oldExercise);
         int userId = SharedPreferenceManager.getLoggedUserID(requireActivity());
         ExerciseList exerciseListList = helper.getExerciseListByID(pid, userId,oldExercise.getExerciseID());
         planViewModel.addPlanList(exerciseListList);
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        helper.close();
     }
 }

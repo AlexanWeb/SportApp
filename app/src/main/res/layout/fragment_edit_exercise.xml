@@ -82,9 +82,9 @@
         android:textSize="@dimen/target_text_size_small"
         app:layout_constraintTop_toBottomOf="@id/image_edit_exercise"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/text_set_edit_exercise"
+        app:layout_constraintStart_toEndOf="@+id/text_label_set_edit_exercise"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="3"
+        app:layout_constraintHorizontal_weight="8"
         app:layout_constraintVertical_weight="7"/>
 
     <TextView
@@ -99,8 +99,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/text_description_box_edit_exercise"
         app:layout_constraintBottom_toTopOf="@id/text_set_edit_exercise"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintVertical_weight="1"/>
+        app:layout_constraintHorizontal_weight="4"
+        app:layout_constraintVertical_weight="2"/>
 
     <EditText
         android:layout_width="0dp"
@@ -114,8 +114,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/text_description_box_edit_exercise"
         app:layout_constraintBottom_toTopOf="@id/text_label_rep_edit_exercise"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintVertical_weight="3"/>
+        app:layout_constraintVertical_weight="2"/>
 
     <TextView
         android:layout_width="0dp"
@@ -129,7 +128,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/text_rep_edit_exercise"
         app:layout_constraintEnd_toStartOf="@id/text_description_box_edit_exercise"
-        app:layout_constraintVertical_weight="1" />
+        app:layout_constraintVertical_weight="2" />
 
     <EditText
         android:layout_width="0dp"
@@ -143,7 +142,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/text_label_break_edit_exercise"
         app:layout_constraintEnd_toStartOf="@id/text_description_box_edit_exercise"
-        app:layout_constraintVertical_weight="3"/>
+        app:layout_constraintVertical_weight="2"/>
 
     <TextView
         android:layout_width="0dp"
@@ -157,7 +156,7 @@
         app:layout_constraintBottom_toTopOf="@id/text_break_edit_exercise"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/text_description_box_edit_exercise"
-        app:layout_constraintVertical_weight="1"/>
+        app:layout_constraintVertical_weight="2"/>
 
     <EditText
         android:layout_width="0dp"
@@ -171,7 +170,7 @@
         app:layout_constraintBottom_toTopOf="@+id/text_label_weight_edit_exercise"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/text_description_box_edit_exercise"
-        app:layout_constraintVertical_weight="3"/>
+        app:layout_constraintVertical_weight="2"/>
 
 
     <TextView
@@ -186,8 +185,7 @@
         app:layout_constraintEnd_toStartOf="@id/text_description_box_edit_exercise"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_break_edit_exercise"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintVertical_weight="1"/>
+        app:layout_constraintVertical_weight="2"/>
 
     <EditText
         android:id="@+id/text_weight_edit_exercise"
@@ -201,8 +199,7 @@
         app:layout_constraintEnd_toStartOf="@id/text_description_box_edit_exercise"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_label_weight_edit_exercise"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintVertical_weight="3"/>
+        app:layout_constraintVertical_weight="2"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
@@ -216,6 +213,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"/>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

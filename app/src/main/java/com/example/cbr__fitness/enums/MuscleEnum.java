@@ -12,7 +12,7 @@ public enum MuscleEnum implements EnumInterface {
     FOREARMS(3, "Unterarme", "forearms"),
     CHEST(4, "Brust", "chest"),
     ABS(5, "Bauchmuskeln", "abdominals"),
-    SHOULDER(6, "Schultern", "shoulders"),
+    FRONTAL_SHOULDER(6, "Vordere Schultern", "frontal_shoulders"),
     CALVES(7, "Waden", "calves"),
     HAMSTRINGS(8, "Hinterer Oberschenkel", "hamstrings"),
     QUADRICEPS(9, "Vorderer Oberschenkel", "quadriceps"),
@@ -21,7 +21,8 @@ public enum MuscleEnum implements EnumInterface {
     MIDDLE_BACK(15, "Mittlerer Rücken", "middle_back"),
     LOWER_BACK(12, "Unterer Ruecken", "lower_back"),
     SIDE_ABS(13, "Seitliche Bauchmuskeln", "side_abs"),
-    NONE(14, "Keine Auswahl", "none")
+    NONE(14, "Keine Auswahl", "none"),
+    BACK_SHOULDER(15, "Hintere Schultern", "back_shoulders")
     ;
 
     private static Map<Integer, MuscleEnum> muscleEnumMap = new HashMap<>();

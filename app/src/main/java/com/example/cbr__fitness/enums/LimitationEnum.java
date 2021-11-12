@@ -11,7 +11,9 @@ public enum LimitationEnum implements EnumInterface {
     SHOULDER(3, "Schultern"),
     KNEES(4,"Knie"),
     SPINE(5, "Wirbelsäule"),
-    HIPS(6, "Hüften")
+    HIPS(6, "Hüften"),
+    PACEMAKER(7, "Herzschrittmacher"),
+    DIABETES(8, "Diabetes")
     ;
 
     private int ID;

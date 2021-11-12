@@ -1,21 +1,16 @@
 package com.example.cbr__fitness.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
-import androidx.navigation.NavHost;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.example.cbr__fitness.R;
 import com.example.cbr__fitness.logic.SharedPreferenceManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -80,7 +75,6 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
     @Override
     public boolean onSupportNavigateUp() {
         boolean test = navController.navigateUp();
-        System.out.println("NAVIGATION UP " + test);
         return test;
     }
 }
